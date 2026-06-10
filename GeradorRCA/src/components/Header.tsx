@@ -53,18 +53,18 @@ export default function Header() {
       if (rcaId) {
         const result = await updateRCA(rcaId, doc)
         setSavedAt(result.updated_at)
-        setMessage({ type: 'success', text: `RCA ${rcaId} atualizada!` })
+        setMessage({ type: 'success', text: 'RCA salva... para gerar o arquivo vá em Gerar RCA' })
       } else {
         const result = await publishRCA(doc)
         setRcaId(result.id)
         setSavedAt(result.created_at)
-        setMessage({ type: 'success', text: `RCA gravada: ${result.id}` })
+        setMessage({ type: 'success', text: 'RCA salva... para gerar o arquivo vá em Gerar RCA' })
       }
     } catch (err) {
       setMessage({ type: 'error', text: 'Erro ao gravar no banco' })
     } finally {
       setPublishing(false)
-      setTimeout(() => setMessage(null), 5000)
+      setTimeout(() => setMessage(null), 6000)
     }
   }
 
@@ -76,13 +76,12 @@ export default function Header() {
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
             Gerador de RCA
           </h1>
-          {rcaId && (
-            <span className="text-xs font-mono bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300 px-2 py-0.5 rounded">
-              {rcaId}
-            </span>
-          )}
-          <span className="text-sm text-gray-500 dark:text-gray-400 hidden sm:inline">
-            Olos Tecnologia
+        </div>
+
+        {/* Status central */}
+        <div className="hidden sm:flex items-center gap-2">
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {rcaId ? `Editando RCA ${rcaId}` : 'Editando RCA nova'}
           </span>
         </div>
 
