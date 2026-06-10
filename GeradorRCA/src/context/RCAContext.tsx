@@ -204,6 +204,6 @@ export const useAIConfigStore = create<AIConfigStore>((set, get) => ({
 
   isConfigured: () => {
     const { config } = get()
-    return !!(config?.awsRegion && config?.modelId && config?.accessKeyId && config?.secretAccessKey)
+    return !!(config?.awsRegion && config?.modelId && config?.apiKey)
   },
 }))

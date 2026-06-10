@@ -15,9 +15,8 @@ export default function AdminPanel() {
 
   const [formData, setFormData] = useState<AIConfig>({
     awsRegion: 'us-east-1',
-    modelId: 'anthropic.claude-3-sonnet-20240229-v1:0',
-    accessKeyId: '',
-    secretAccessKey: '',
+    modelId: 'us.anthropic.claude-sonnet-4-20250514-v1:0',
+    apiKey: '',
   })
 
   const [testing, setTesting] = useState(false)
@@ -65,9 +64,8 @@ export default function AdminPanel() {
       clearConfig()
       setFormData({
         awsRegion: 'us-east-1',
-        modelId: 'anthropic.claude-3-sonnet-20240229-v1:0',
-        accessKeyId: '',
-        secretAccessKey: '',
+        modelId: 'us.anthropic.claude-sonnet-4-20250514-v1:0',
+        apiKey: '',
       })
       setTestResult(null)
     }
@@ -171,33 +169,25 @@ export default function AdminPanel() {
                 value={formData.modelId}
                 onChange={(e) => setFormData({ ...formData, modelId: e.target.value })}
                 className="input-field"
-                placeholder="anthropic.claude-3-sonnet-20240229-v1:0"
+                placeholder="us.anthropic.claude-sonnet-4-20250514-v1:0"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Ex: anthropic.claude-3-sonnet-20240229-v1:0, anthropic.claude-3-haiku-20240307-v1:0
+                Ex: us.anthropic.claude-sonnet-4-20250514-v1:0, us.anthropic.claude-3-5-haiku-20241022-v1:0
               </p>
             </div>
 
             <div>
-              <label className="label">AWS Access Key ID</label>
-              <input
-                type="text"
-                value={formData.accessKeyId}
-                onChange={(e) => setFormData({ ...formData, accessKeyId: e.target.value })}
-                className="input-field font-mono text-sm"
-                placeholder="AKIAIOSFODNN7EXAMPLE"
-              />
-            </div>
-
-            <div>
-              <label className="label">AWS Secret Access Key</label>
+              <label className="label">API Key do Bedrock</label>
               <input
                 type="password"
-                value={formData.secretAccessKey}
-                onChange={(e) => setFormData({ ...formData, secretAccessKey: e.target.value })}
+                value={formData.apiKey}
+                onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
                 className="input-field font-mono text-sm"
-                placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+                placeholder="Cole aqui sua API Key do Bedrock"
               />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Gerada no console AWS Bedrock → API Keys
+              </p>
             </div>
           </div>
 
@@ -243,7 +233,7 @@ export default function AdminPanel() {
             </button>
             <button
               onClick={handleTest}
-              disabled={testing || !formData.accessKeyId || !formData.secretAccessKey}
+              disabled={testing || !formData.apiKey}
               className="btn-secondary flex items-center gap-2"
             >
               <Wifi className="w-4 h-4" />

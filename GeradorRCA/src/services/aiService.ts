@@ -1,47 +1,45 @@
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime'
 import { AIConfig, RCADocument } from '../types/rca'
 
 export class AIService {
-  private client: BedrockRuntimeClient | null = null
   private config: AIConfig | null = null
 
   configure(config: AIConfig) {
     this.config = config
-    this.client = new BedrockRuntimeClient({
-      region: config.awsRegion,
-      credentials: {
-        accessKeyId: config.accessKeyId,
-        secretAccessKey: config.secretAccessKey,
-      },
-    })
   }
 
   isConfigured(): boolean {
-    return !!(this.client && this.config)
+    return !!(this.config?.apiKey && this.config?.awsRegion && this.config?.modelId)
+  }
+
+  private getEndpoint(modelId: string): string {
+    const region = this.config!.awsRegion
+    return `https://bedrock-runtime.${region}.amazonaws.com/model/${modelId}/converse`
   }
 
   async testConnection(): Promise<{ success: boolean; message: string }> {
-    if (!this.client || !this.config) {
+    if (!this.config) {
       return { success: false, message: 'Configuração não encontrada' }
     }
 
     try {
-      const payload = {
-        anthropic_version: 'bedrock-2023-05-31',
-        max_tokens: 50,
-        messages: [
-          { role: 'user', content: 'Diga apenas "OK" para testar a conexão.' },
-        ],
-      }
-
-      const command = new InvokeModelCommand({
-        modelId: this.config.modelId,
-        contentType: 'application/json',
-        accept: 'application/json',
-        body: JSON.stringify(payload),
+      const response = await fetch(this.getEndpoint(this.config.modelId), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.config.apiKey}`,
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: 'user', content: [{ text: 'Diga apenas "OK" para testar a conexão.' }] },
+          ],
+        }),
       })
 
-      await this.client.send(command)
+      if (!response.ok) {
+        const error = await response.text()
+        return { success: false, message: `Erro ${response.status}: ${error}` }
+      }
+
       return { success: true, message: 'Conexão estabelecida com sucesso!' }
     } catch (error: any) {
       return {
@@ -55,32 +53,37 @@ export class AIService {
     field: string,
     context: Partial<RCADocument>
   ): Promise<string> {
-    if (!this.client || !this.config) {
+    if (!this.config) {
       throw new Error('IA não configurada')
     }
 
     const prompt = this.buildPrompt(field, context)
 
-    const payload = {
-      anthropic_version: 'bedrock-2023-05-31',
-      max_tokens: 2000,
-      messages: [
-        { role: 'user', content: prompt },
-      ],
-    }
-
-    const command = new InvokeModelCommand({
-      modelId: this.config.modelId,
-      contentType: 'application/json',
-      accept: 'application/json',
-      body: JSON.stringify(payload),
+    const response = await fetch(this.getEndpoint(this.config.modelId), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.config.apiKey}`,
+      },
+      body: JSON.stringify({
+        messages: [
+          { role: 'user', content: [{ text: prompt }] },
+        ],
+        inferenceConfig: {
+          maxTokens: 2000,
+        },
+      }),
     })
 
-    const response = await this.client.send(command)
-    const responseBody = JSON.parse(new TextDecoder().decode(response.body))
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Erro ${response.status}: ${errorText}`)
+    }
 
-    if (responseBody.content && responseBody.content.length > 0) {
-      return responseBody.content[0].text
+    const data = await response.json()
+
+    if (data.output?.message?.content && data.output.message.content.length > 0) {
+      return data.output.message.content[0].text
     }
 
     throw new Error('Resposta vazia da IA')

@@ -53,8 +53,7 @@ export interface RCADocument {
 export interface AIConfig {
   awsRegion: string;
   modelId: string;
-  accessKeyId: string;
-  secretAccessKey: string;
+  apiKey: string;
 }
 
 export type RCASection =
