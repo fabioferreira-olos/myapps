@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, FileDown, FileText, Calendar } from 'lucide-react'
+import { ArrowLeft, FileDown, FileText, Calendar, Pencil } from 'lucide-react'
 import { fetchRCAs, fetchRCA, RCASummary } from '../services/apiService'
 import { exportToPdf } from '../services/exportPdf'
 import { exportToDocx } from '../services/exportDocx'
+import { useRCAStore } from '../context/RCAContext'
 
 export default function RCAList() {
   const navigate = useNavigate()
+  const { loadDocument, setRcaId } = useRCAStore()
   const [rcas, setRcas] = useState<RCASummary[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState<string | null>(null)
@@ -66,6 +68,18 @@ export default function RCAList() {
       alert('Erro ao exportar DOCX')
     } finally {
       setExporting(null)
+    }
+  }
+
+  const handleEdit = async (id: string) => {
+    try {
+      const record = await fetchRCA(id)
+      loadDocument(record.data, id)
+      setRcaId(id)
+      navigate('/')
+    } catch (err) {
+      console.error('Error loading RCA for edit:', err)
+      alert('Erro ao carregar RCA para edição')
     }
   }
 
@@ -166,6 +180,14 @@ export default function RCAList() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  <button
+                    onClick={() => handleEdit(rca.id)}
+                    className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3"
+                    title="Editar RCA"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                    Editar
+                  </button>
                   <button
                     onClick={() => handleExportPdf(rca.id)}
                     disabled={exporting === rca.id + '-pdf'}

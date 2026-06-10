@@ -18,7 +18,7 @@ function validateDocument(doc: any): string[] {
   if (!doc.recurrence) errors.push('Reincidência')
   if (!doc.unavailability) errors.push('Indisponibilidade')
   if (!doc.affectedClients || doc.affectedClients.length < minLen) errors.push('Clientes Afetados')
-  if (!doc.affectedServices || doc.affectedServices.length < minLen) errors.push('Serviços Afetados (mín. 5 caracteres)')
+  if (!doc.affectedServices || doc.affectedServices.length < 2) errors.push('Serviços Afetados (mín. 2 caracteres)')
   if (!doc.clientImpactDescription || doc.clientImpactDescription.replace(/<[^>]*>/g, '').length < minLen) errors.push('Descrição do Impacto (mín. 5 caracteres)')
   if (!doc.rootCause || doc.rootCause.replace(/<[^>]*>/g, '').length < minLen) errors.push('Causa Raiz (mín. 5 caracteres)')
   if (doc.correctiveActions.length === 0) errors.push('Ações Corretivas (pelo menos 1)')
