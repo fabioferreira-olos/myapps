@@ -196,9 +196,6 @@ export async function exportToPdf(doc: RCADocument): Promise<void> {
   if (doc.affectedServices) {
     addField('Serviços Afetados', doc.affectedServices)
   }
-  if (doc.affectedEnvironments) {
-    addField('Ambientes Afetados', doc.affectedEnvironments)
-  }
   if (doc.recurrence) {
     addField('Reincidência', getRecurrenceLabel(doc.recurrence))
   }

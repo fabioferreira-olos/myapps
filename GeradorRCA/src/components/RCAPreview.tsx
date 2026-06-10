@@ -17,7 +17,6 @@ export default function RCAPreview() {
           </h2>
           <div className="flex items-center justify-center gap-4 mt-4 text-sm text-gray-500 dark:text-gray-400">
             {doc.incidentId && <span>ID: {doc.incidentId}</span>}
-            {doc.version && <span>Versão: {doc.version}</span>}
             {doc.createdAt && <span>Data: {doc.createdAt}</span>}
           </div>
         </div>
@@ -26,9 +25,7 @@ export default function RCAPreview() {
         <Section title="Informações Gerais">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <Field label="Criado por" value={doc.createdBy} />
-            <Field label="Revisor" value={doc.reviewer} />
             <Field label="ID do Incidente" value={doc.incidentId} />
-            <Field label="Versão" value={doc.version} />
           </div>
         </Section>
 
@@ -39,7 +36,6 @@ export default function RCAPreview() {
             <Field label="Início" value={doc.startDate ? formatDateTime(doc.startDate) : ''} />
             <Field label="Término" value={doc.endDate ? formatDateTime(doc.endDate) : ''} />
             <Field label="Tempo de Indisponibilidade" value={doc.totalDowntime} />
-            <Field label="Ambientes Afetados" value={doc.affectedEnvironments} />
           </div>
         </Section>
 

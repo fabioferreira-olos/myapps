@@ -100,26 +100,6 @@ export default function RCAForm() {
                 />
               </div>
               <div>
-                <label className="label">Revisor</label>
-                <input
-                  type="text"
-                  value={doc.reviewer}
-                  onChange={(e) => updateField('reviewer', e.target.value)}
-                  className="input-field"
-                  placeholder="Nome do revisor"
-                />
-              </div>
-              <div>
-                <label className="label">Versão</label>
-                <input
-                  type="text"
-                  value={doc.version}
-                  onChange={(e) => updateField('version', e.target.value)}
-                  className="input-field"
-                  placeholder="1.0"
-                />
-              </div>
-              <div>
                 <label className="label">Data de Criação</label>
                 <input
                   type="date"
@@ -181,16 +161,6 @@ export default function RCAForm() {
                   readOnly
                   className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
                   placeholder="Calculado automaticamente"
-                />
-              </div>
-              <div>
-                <label className="label">Ambientes Afetados</label>
-                <input
-                  type="text"
-                  value={doc.affectedEnvironments}
-                  onChange={(e) => updateField('affectedEnvironments', e.target.value)}
-                  className="input-field"
-                  placeholder="Ex: Produção, Homologação"
                 />
               </div>
               <div>

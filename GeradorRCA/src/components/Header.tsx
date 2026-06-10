@@ -7,17 +7,23 @@ import { publishRCA, updateRCA } from '../services/apiService'
 
 function validateDocument(doc: any): string[] {
   const errors: string[] = []
-  if (!doc.title) errors.push('Título')
-  if (!doc.incidentId) errors.push('ID do Incidente')
-  if (!doc.description) errors.push('Descrição do Incidente')
+  const minLen = 5
+  if (!doc.title || doc.title.length < minLen) errors.push('Título (mín. 5 caracteres)')
+  if (!doc.incidentId || doc.incidentId.length < minLen) errors.push('ID do Incidente (mín. 5 caracteres)')
+  if (!doc.createdBy || doc.createdBy.length < minLen) errors.push('Criado por (mín. 5 caracteres)')
+  if (!doc.createdAt) errors.push('Data de Criação')
+  if (!doc.description || doc.description.length < minLen) errors.push('Descrição do Incidente (mín. 5 caracteres)')
   if (!doc.startDate) errors.push('Data de Início')
   if (!doc.endDate) errors.push('Data de Término')
   if (!doc.recurrence) errors.push('Reincidência')
   if (!doc.unavailability) errors.push('Indisponibilidade')
-  if (!doc.affectedClients) errors.push('Clientes Afetados')
-  if (!doc.rootCause) errors.push('Causa Raiz')
-  if (doc.correctiveActions.length === 0) errors.push('Ações Corretivas (pelo menos uma)')
+  if (!doc.affectedClients || doc.affectedClients.length < minLen) errors.push('Clientes Afetados')
+  if (!doc.affectedServices || doc.affectedServices.length < minLen) errors.push('Serviços Afetados (mín. 5 caracteres)')
+  if (!doc.clientImpactDescription || doc.clientImpactDescription.replace(/<[^>]*>/g, '').length < minLen) errors.push('Descrição do Impacto (mín. 5 caracteres)')
+  if (!doc.rootCause || doc.rootCause.replace(/<[^>]*>/g, '').length < minLen) errors.push('Causa Raiz (mín. 5 caracteres)')
+  if (doc.correctiveActions.length === 0) errors.push('Ações Corretivas (pelo menos 1)')
   if (doc.correctiveActions.some((a: any) => !a.actionType)) errors.push('Tipo da Ação Corretiva')
+  if (!doc.considerations || doc.considerations.replace(/<[^>]*>/g, '').length < minLen) errors.push('Considerações Finais (mín. 5 caracteres)')
   return errors
 }
 

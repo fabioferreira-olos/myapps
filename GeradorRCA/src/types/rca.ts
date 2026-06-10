@@ -19,8 +19,6 @@ export interface RCADocument {
   title: string;
   createdAt: string;
   createdBy: string;
-  reviewer: string;
-  version: string;
 
   // Incident Info
   incidentId: string;
@@ -28,7 +26,6 @@ export interface RCADocument {
   startDate: string;
   endDate: string;
   totalDowntime: string;
-  affectedEnvironments: string;
   recurrence: 'yes' | 'no' | '';
   unavailability: 'none' | 'partial' | 'total' | '';
 

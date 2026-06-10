@@ -96,7 +96,6 @@ Contexto do incidente:
 - Título: ${context.title || 'Não definido'}
 - ID do Incidente: ${context.incidentId || 'Não definido'}
 - Descrição: ${context.description || 'Não definida'}
-- Ambientes afetados: ${context.affectedEnvironments || 'Não definidos'}
 - Serviços afetados: ${context.affectedServices || 'Não definidos'}
 - Clientes afetados: ${context.affectedClients || 'Não definidos'}
 - Causa raiz: ${context.rootCause || 'Não definida'}
