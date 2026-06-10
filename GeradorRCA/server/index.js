@@ -1,6 +1,7 @@
 import express from 'express'
 import pg from 'pg'
 import cors from 'cors'
+import crypto from 'crypto'
 
 const { Pool } = pg
 
@@ -15,6 +16,11 @@ const pool = new Pool({
   user: process.env.DB_USER || 'rcagen',
   password: process.env.DB_PASSWORD || 'RcaGen2026Secure',
 })
+
+// Hash password with SHA-256 (one-way, not reversible)
+function hashPassword(password) {
+  return crypto.createHash('sha256').update(password).digest('hex')
+}
 
 // Initialize database tables
 async function initDB() {
@@ -37,6 +43,20 @@ async function initDB() {
         updated_at TIMESTAMP DEFAULT NOW()
       )
     `)
+
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS settings (
+        key VARCHAR(100) PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    `)
+
+    // Seed default admin password if not exists
+    const pwResult = await client.query("SELECT key FROM settings WHERE key = 'admin_password'")
+    if (pwResult.rows.length === 0) {
+      const defaultHash = hashPassword('Olos@123!')
+      await client.query("INSERT INTO settings (key, value) VALUES ('admin_password', $1)", [defaultHash])
+    }
 
     console.log('Database tables initialized')
   } finally {
@@ -199,6 +219,60 @@ app.delete('/api/rcas/:id', async (req, res) => {
   } catch (err) {
     console.error('Error deleting RCA:', err)
     res.status(500).json({ error: 'Failed to delete RCA' })
+  }
+})
+
+// ========== AUTH ==========
+
+// POST /api/auth/login - Verify password
+app.post('/api/auth/login', async (req, res) => {
+  const { password } = req.body
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' })
+  }
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'admin_password'")
+    if (result.rows.length === 0) {
+      return res.status(500).json({ error: 'Password not configured' })
+    }
+    const storedHash = result.rows[0].value
+    const inputHash = hashPassword(password)
+    if (inputHash === storedHash) {
+      res.json({ success: true })
+    } else {
+      res.status(401).json({ error: 'Invalid password' })
+    }
+  } catch (err) {
+    console.error('Error verifying password:', err)
+    res.status(500).json({ error: 'Failed to verify password' })
+  }
+})
+
+// POST /api/auth/change-password - Change admin password
+app.post('/api/auth/change-password', async (req, res) => {
+  const { currentPassword, newPassword } = req.body
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'Current and new password are required' })
+  }
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'New password must be at least 6 characters' })
+  }
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'admin_password'")
+    if (result.rows.length === 0) {
+      return res.status(500).json({ error: 'Password not configured' })
+    }
+    const storedHash = result.rows[0].value
+    const currentHash = hashPassword(currentPassword)
+    if (currentHash !== storedHash) {
+      return res.status(401).json({ error: 'Current password is incorrect' })
+    }
+    const newHash = hashPassword(newPassword)
+    await pool.query("UPDATE settings SET value = $1 WHERE key = 'admin_password'", [newHash])
+    res.json({ success: true, message: 'Password updated successfully' })
+  } catch (err) {
+    console.error('Error changing password:', err)
+    res.status(500).json({ error: 'Failed to change password' })
   }
 })
 
