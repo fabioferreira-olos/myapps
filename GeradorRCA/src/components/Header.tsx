@@ -51,20 +51,17 @@ export default function Header() {
     setPublishing(true)
     try {
       if (rcaId) {
-        const result = await updateRCA(rcaId, doc)
-        setSavedAt(result.updated_at)
-        setMessage({ type: 'success', text: 'RCA salva... para gerar o arquivo vá em Gerar RCA' })
+        await updateRCA(rcaId, doc)
       } else {
         const result = await publishRCA(doc)
         setRcaId(result.id)
-        setSavedAt(result.created_at)
-        setMessage({ type: 'success', text: 'RCA salva... para gerar o arquivo vá em Gerar RCA' })
       }
+      navigate('/rcas')
     } catch (err) {
       setMessage({ type: 'error', text: 'Erro ao gravar no banco' })
+      setTimeout(() => setMessage(null), 5000)
     } finally {
       setPublishing(false)
-      setTimeout(() => setMessage(null), 6000)
     }
   }
 

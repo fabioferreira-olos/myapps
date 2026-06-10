@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, FileDown, FileText, Calendar, Pencil } from 'lucide-react'
+import { ArrowLeft, FileDown, FileText, Calendar, Pencil, Plus } from 'lucide-react'
 import { fetchRCAs, fetchRCA, RCASummary } from '../services/apiService'
 import { exportToPdf } from '../services/exportPdf'
 import { exportToDocx } from '../services/exportDocx'
@@ -8,7 +8,7 @@ import { useRCAStore } from '../context/RCAContext'
 
 export default function RCAList() {
   const navigate = useNavigate()
-  const { loadDocument, setRcaId } = useRCAStore()
+  const { loadDocument, setRcaId, resetDocument } = useRCAStore()
   const [rcas, setRcas] = useState<RCASummary[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState<string | null>(null)
@@ -108,6 +108,16 @@ export default function RCAList() {
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             RCAs Gravadas
           </h1>
+          <button
+            onClick={() => {
+              resetDocument()
+              navigate('/')
+            }}
+            className="btn-primary flex items-center gap-2 text-sm ml-auto"
+          >
+            <Plus className="w-4 h-4" />
+            Nova RCA
+          </button>
         </div>
 
         {/* Date filters */}
