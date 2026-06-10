@@ -68,6 +68,18 @@ export default function Header() {
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3 sticky top-0 z-50">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              if (confirm('Tem certeza que deseja limpar todos os campos e começar do zero?')) {
+                resetDocument()
+              }
+            }}
+            className="btn-secondary flex items-center gap-2 text-sm"
+            title="Limpar campos e iniciar nova RCA"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span className="hidden sm:inline">Limpar/Nova</span>
+          </button>
           <FileText className="w-7 h-7 text-primary-600" />
           <h1 className="text-xl font-bold text-gray-900 dark:text-white">
             Gerador de RCA
@@ -117,18 +129,6 @@ export default function Header() {
           >
             <List className="w-4 h-4" />
             <span className="hidden sm:inline">Gerar RCA</span>
-          </button>
-
-          <button
-            onClick={() => {
-              if (confirm('Tem certeza que deseja limpar todos os campos?')) {
-                resetDocument()
-              }
-            }}
-            className="btn-secondary flex items-center gap-2 text-sm"
-            title="Limpar documento"
-          >
-            <RotateCcw className="w-4 h-4" />
           </button>
 
           <button

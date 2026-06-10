@@ -33,96 +33,145 @@ export default function UserGuide() {
           <ol>
             <li><strong>Informações Gerais</strong> — Título, ID do incidente, autor e data de criação</li>
             <li><strong>Incidente</strong> — Descrição, datas de início/término, reincidência e nível de indisponibilidade</li>
-            <li><strong>Impacto</strong> — Clientes afetados (seleção), serviços afetados e descrição do impacto</li>
+            <li><strong>Impacto</strong> — Clientes afetados (seleção com busca), serviços afetados e descrição do impacto</li>
             <li><strong>Linha do Tempo</strong> — Eventos em ordem cronológica com data/hora</li>
             <li><strong>Causa Raiz</strong> — Descrição técnica do que causou o incidente e como foi resolvido</li>
-            <li><strong>Ações Corretivas</strong> — Ações tomadas para corrigir, com responsável, prazo, status e tipo (Definitiva ou Contorno)</li>
+            <li><strong>Ações Corretivas</strong> — Ações tomadas para corrigir, com responsável, prazo, status e tipo (Definitiva ou Contorno). Obrigatório pelo menos 1 item.</li>
             <li><strong>Ações Preventivas</strong> — Ações para evitar recorrência (opcional)</li>
-            <li><strong>Considerações</strong> — Observações e recomendações finais</li>
+            <li><strong>Considerações</strong> — Observações e recomendações finais (opcional — se vazio, não aparece no documento exportado)</li>
           </ol>
 
           <h2>Campos Obrigatórios</h2>
-          <p>Para gravar uma RCA no banco, todos os campos devem estar preenchidos (exceto Ações Preventivas que é opcional):</p>
+          <p>Para gravar uma RCA no banco, os seguintes campos devem estar preenchidos:</p>
           <ul>
-            <li>Campos de texto precisam ter no mínimo <strong>5 caracteres</strong></li>
-            <li>Serviços Afetados precisa ter no mínimo <strong>2 caracteres</strong></li>
-            <li>Selects (Reincidência, Indisponibilidade) devem ter uma opção selecionada</li>
-            <li>Ações Corretivas devem ter pelo menos <strong>1 item</strong> com o Tipo definido</li>
-            <li>Todas as datas são obrigatórias</li>
+            <li>Campos de texto com mín. <strong>5 caracteres</strong>: Título, ID Incidente, Criado por, Descrição, Clientes Afetados, Descrição do Impacto, Causa Raiz</li>
+            <li>Serviços Afetados: mín. <strong>2 caracteres</strong></li>
+            <li>Selects obrigatórios: Reincidência (Sim/Não), Indisponibilidade (Nenhuma/Parcial/Total)</li>
+            <li>Datas obrigatórias: Data de Criação, Data Início, Data Término</li>
+            <li>Ações Corretivas: mín. <strong>1 item</strong> com Tipo (Definitiva/Contorno) definido</li>
           </ul>
+          <p><strong>Opcionais:</strong> Ações Preventivas e Considerações Finais.</p>
 
-          <h2>Salvando e Gravando</h2>
+          <h2>Botões do Header</h2>
           <table>
             <thead>
               <tr>
-                <th>Ação</th>
-                <th>O que faz</th>
+                <th>Botão</th>
+                <th>Função</th>
               </tr>
             </thead>
             <tbody>
+              <tr>
+                <td><strong>Limpar/Nova</strong></td>
+                <td>Limpa todos os campos e inicia uma RCA do zero. Se estiver editando uma RCA existente, desvincula o ID e começa uma nova.</td>
+              </tr>
               <tr>
                 <td><strong>Draft</strong></td>
                 <td>Salva os dados localmente no navegador. Útil para continuar depois sem perder o progresso. Não gera ID.</td>
               </tr>
               <tr>
                 <td><strong>Gravar</strong></td>
-                <td>Valida os campos obrigatórios e salva no banco de dados. Gera um ID único (ex: RCA20260610-01) e redireciona para a lista de RCAs.</td>
+                <td>Valida os campos obrigatórios e salva no banco. Gera um ID único (ex: RCA20260610-01) e redireciona para a lista de RCAs.</td>
               </tr>
               <tr>
                 <td><strong>Atualizar</strong></td>
-                <td>Aparece quando você está editando uma RCA existente. Salva as alterações no banco e redireciona para a lista.</td>
+                <td>Aparece quando editando uma RCA existente. Salva as alterações e redireciona para a lista.</td>
+              </tr>
+              <tr>
+                <td><strong>Preview</strong></td>
+                <td>Visualiza o documento formatado antes de gravar.</td>
+              </tr>
+              <tr>
+                <td><strong>Gerar RCA</strong></td>
+                <td>Abre a lista de RCAs gravadas para exportar ou editar.</td>
+              </tr>
+              <tr>
+                <td><strong>⚙️ (Engrenagem)</strong></td>
+                <td>Acessa a área de administração.</td>
+              </tr>
+              <tr>
+                <td><strong>🌙/☀️</strong></td>
+                <td>Alterna entre modo claro e escuro.</td>
+              </tr>
+              <tr>
+                <td><strong>? (Interrogação)</strong></td>
+                <td>Abre este guia de uso.</td>
               </tr>
             </tbody>
           </table>
+
+          <h2>Status do Header</h2>
+          <p>O centro do header mostra o estado atual:</p>
+          <ul>
+            <li><strong>"Editando RCA nova"</strong> — Criando uma RCA do zero, sem ID</li>
+            <li><strong>"Editando RCA [ID]"</strong> — Editando uma RCA já salva no banco</li>
+          </ul>
 
           <h2>Editando uma RCA Existente</h2>
           <ol>
             <li>Clique no botão <strong>"Gerar RCA"</strong> no header</li>
             <li>Na lista, clique em <strong>"Editar"</strong> na RCA desejada</li>
+            <li>Digite a <strong>senha de edição</strong> quando solicitado</li>
             <li>O formulário será carregado com os dados da RCA</li>
-            <li>O status no header mostrará "Editando RCA [ID]"</li>
+            <li>O status mostrará "Editando RCA [ID]" e o botão muda para "Atualizar"</li>
             <li>Faça as alterações e clique em <strong>"Atualizar"</strong></li>
           </ol>
 
           <h2>Exportando PDF / DOCX</h2>
           <ol>
             <li>Clique no botão <strong>"Gerar RCA"</strong> no header</li>
-            <li>Use os filtros de data para encontrar a RCA desejada</li>
+            <li>Use os filtros de data para encontrar a RCA desejada (padrão: ano atual)</li>
             <li>Clique em <strong>"PDF"</strong> ou <strong>"DOCX"</strong> para baixar o arquivo</li>
           </ol>
           <p>Os documentos exportados incluem o cabeçalho da Olos com logo, endereço e informações de contato.</p>
+          <p><strong>Nota:</strong> Se o campo Considerações Finais estiver vazio, ele não aparece no documento gerado.</p>
+
+          <h2>Seleção de Clientes</h2>
+          <p>Na seção Impacto, o campo "Clientes Afetados" funciona como um seletor com busca:</p>
+          <ul>
+            <li>Use a caixa de busca para filtrar clientes pelo nome</li>
+            <li>Marque/desmarque os checkboxes para selecionar</li>
+            <li>Os clientes selecionados aparecem como tags abaixo, com botão ✕ para remover</li>
+            <li>Os clientes disponíveis são gerenciados na área de Administração</li>
+          </ul>
 
           <h2>Assistente de IA</h2>
-          <p>
-            O assistente de IA pode sugerir textos para campos como Causa Raiz, Impacto e Considerações.
-            Para usá-lo:
-          </p>
+          <p>O assistente pode sugerir textos para campos como Causa Raiz, Impacto e Considerações:</p>
           <ol>
-            <li>Configure a IA em <strong>Administração</strong> (ícone de engrenagem)</li>
-            <li>Preencha a Região AWS, Model ID e API Key do Bedrock</li>
-            <li>Nos campos com editor de texto, clique no ícone <strong>✨</strong> (sparkle) para gerar uma sugestão</li>
+            <li>Configure a IA em <strong>Administração</strong> (engrenagem)</li>
+            <li>Preencha Região AWS, Model ID e API Key do Bedrock</li>
+            <li>Use o inference profile ID (ex: <code>us.amazon.nova-pro-v1:0</code>)</li>
+            <li>Nos campos com editor rico, clique no ícone <strong>✨</strong> para gerar uma sugestão</li>
           </ol>
 
           <h2>Administração</h2>
-          <p>Acesse pelo ícone de <strong>engrenagem</strong> no header. A senha padrão é fornecida pelo administrador.</p>
+          <p>Acesse pelo ícone de <strong>engrenagem</strong>. Requer senha (configurável).</p>
+
+          <h3>Seções disponíveis:</h3>
           <ul>
             <li><strong>Configuração de IA</strong> — Região, Model ID e API Key do AWS Bedrock</li>
-            <li><strong>Cadastro de Clientes</strong> — Adicione ou remova clientes disponíveis para seleção nos documentos RCA</li>
+            <li><strong>Cadastro de Clientes</strong> — Adicione (separando por vírgulas para múltiplos) ou remova clientes</li>
+            <li><strong>Senha de Edição de RCAs</strong> — Define a senha necessária para editar RCAs gravadas (visível, sem criptografia)</li>
+            <li><strong>Deletar RCA</strong> — Informe o ID da RCA e confirme digitando "TENHO CERTEZA"</li>
+            <li><strong>Alterar Senha</strong> — Troca a senha de acesso à administração (armazenada com hash SHA-256)</li>
           </ul>
 
-          <h2>Status do Header</h2>
-          <p>O centro do header mostra o estado atual:</p>
+          <h2>ID das RCAs</h2>
+          <p>O formato do ID é <code>RCAYYYYMMDD-nn</code> onde:</p>
           <ul>
-            <li><strong>"Editando RCA nova"</strong> — Você está criando uma RCA do zero</li>
-            <li><strong>"Editando RCA [ID]"</strong> — Você está editando uma RCA existente</li>
+            <li><code>YYYY</code> = ano, <code>MM</code> = mês, <code>DD</code> = dia</li>
+            <li><code>nn</code> = sequencial do dia (01 a 99)</li>
+            <li>Exemplo: <code>RCA20260610-01</code> (primeira RCA do dia 10/06/2026)</li>
           </ul>
+          <p>O ID é gerado automaticamente no momento do "Gravar".</p>
 
           <h2>Dicas</h2>
           <ul>
-            <li>Use o botão <strong>"Nova RCA"</strong> na página de listagem para começar uma RCA limpa</li>
-            <li>O botão <strong>"Preview"</strong> permite visualizar como ficará o documento antes de gravar</li>
-            <li>O tempo de indisponibilidade é calculado automaticamente a partir das datas de início e término</li>
-            <li>Use o <strong>Draft</strong> frequentemente para não perder dados em caso de fechar o navegador</li>
+            <li>Use <strong>"Limpar/Nova"</strong> para começar do zero a qualquer momento</li>
+            <li>Use o <strong>Draft</strong> frequentemente para não perder dados se fechar o navegador</li>
+            <li>O tempo de indisponibilidade é calculado automaticamente a partir das datas</li>
+            <li>Na lista de RCAs, use <strong>"Nova RCA"</strong> para iniciar uma nova a partir dali</li>
+            <li>Ao cadastrar clientes, separe múltiplos nomes por vírgula</li>
           </ul>
         </div>
       </div>
