@@ -6,15 +6,18 @@ import AIAssistant from './AIAssistant'
 import { useRCAStore } from '../context/RCAContext'
 
 export default function Layout() {
-  const { showPreview, loadDocument } = useRCAStore()
+  const { showPreview, loadDocument, rcaId } = useRCAStore()
 
   useEffect(() => {
-    const draft = localStorage.getItem('rcagen-draft')
-    if (draft) {
-      try {
-        const parsed = JSON.parse(draft)
-        loadDocument(parsed)
-      } catch {}
+    // Only load draft if not already editing a saved RCA
+    if (!rcaId) {
+      const draft = localStorage.getItem('rcagen-draft')
+      if (draft) {
+        try {
+          const parsed = JSON.parse(draft)
+          loadDocument(parsed)
+        } catch {}
+      }
     }
   }, [])
 
