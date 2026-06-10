@@ -1,0 +1,48 @@
+{
+  "name": "rcagen",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.490.0",
+    "@tiptap/extension-bold": "^2.1.13",
+    "@tiptap/extension-bullet-list": "^2.1.13",
+    "@tiptap/extension-document": "^2.1.13",
+    "@tiptap/extension-heading": "^2.1.13",
+    "@tiptap/extension-italic": "^2.1.13",
+    "@tiptap/extension-list-item": "^2.1.13",
+    "@tiptap/extension-ordered-list": "^2.1.13",
+    "@tiptap/extension-paragraph": "^2.1.13",
+    "@tiptap/extension-text": "^2.1.13",
+    "@tiptap/pm": "^2.1.13",
+    "@tiptap/react": "^2.1.13",
+    "@tiptap/starter-kit": "^2.1.13",
+    "date-fns": "^3.3.1",
+    "docx": "^8.5.0",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "lucide-react": "^0.312.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.21.3",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.20",
+    "@types/file-saver": "^2.0.7",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.17",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
+  }
+}
