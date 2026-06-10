@@ -4,7 +4,7 @@ import { ArrowLeft, Save, Trash2, Wifi, WifiOff, Lock, Eye, EyeOff, Plus, X } fr
 import { useAIConfigStore } from '../context/RCAContext'
 import { aiService } from '../services/aiService'
 import { AIConfig } from '../types/rca'
-import { fetchClients, createClient, deleteClient, Client, fetchRCAs, deleteRCA, RCASummary, verifyPassword, changePassword } from '../services/apiService'
+import { fetchClients, createClient, deleteClient, Client, fetchRCAs, deleteRCA, RCASummary, verifyPassword, changePassword, getEditPassword, setEditPassword } from '../services/apiService'
 
 export default function AdminPanel() {
   const navigate = useNavigate()
@@ -42,6 +42,10 @@ export default function AdminPanel() {
   const [confirmPw, setConfirmPw] = useState('')
   const [pwMessage, setPwMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
+  // Edit password state
+  const [editPw, setEditPw] = useState('')
+  const [editPwSaved, setEditPwSaved] = useState(false)
+
   useEffect(() => {
     loadConfig()
   }, [])
@@ -60,6 +64,7 @@ export default function AdminPanel() {
       setPasswordError('')
       loadClients()
       loadRCAs()
+      loadEditPassword()
     } else {
       setPasswordError('Senha incorreta')
     }
@@ -161,6 +166,20 @@ export default function AdminPanel() {
       setPwMessage({ type: 'error', text: result.error || 'Erro ao alterar senha' })
     }
     setTimeout(() => setPwMessage(null), 5000)
+  }
+
+  const loadEditPassword = async () => {
+    const pw = await getEditPassword()
+    setEditPw(pw)
+  }
+
+  const handleSaveEditPassword = async () => {
+    if (!editPw || editPw.length < 3) return
+    const ok = await setEditPassword(editPw)
+    if (ok) {
+      setEditPwSaved(true)
+      setTimeout(() => setEditPwSaved(false), 3000)
+    }
   }
 
   const handleSave = () => {
@@ -427,6 +446,38 @@ export default function AdminPanel() {
         </div>
 
         {/* RCA Management */}
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4">
+          Senha de Edição de RCAs
+        </h2>
+        <div className="card space-y-4">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              Defina a senha necessária para editar RCAs já gravadas. Esta senha é visível aqui e armazenada sem criptografia.
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={editPw}
+              onChange={(e) => setEditPw(e.target.value)}
+              className="input-field flex-1"
+              placeholder="Senha para edição de RCAs (mín. 3 caracteres)"
+            />
+            <button
+              onClick={handleSaveEditPassword}
+              disabled={!editPw || editPw.length < 3}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Save className="w-4 h-4" />
+              Salvar
+            </button>
+          </div>
+          {editPwSaved && (
+            <p className="text-sm text-green-600 dark:text-green-400">✓ Senha de edição salva!</p>
+          )}
+        </div>
+
+        {/* Deletar RCA */}
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4">
           Deletar RCA
         </h2>

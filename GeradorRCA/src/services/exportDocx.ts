@@ -240,7 +240,7 @@ export async function exportToDocx(doc: RCADocument): Promise<void> {
   }
 
   // Considerations
-  if (doc.considerations) {
+  if (doc.considerations && stripHtml(doc.considerations).trim()) {
     addHeading('Considerações')
     addRichText(doc.considerations)
   }

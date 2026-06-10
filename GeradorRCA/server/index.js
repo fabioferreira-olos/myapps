@@ -58,6 +58,12 @@ async function initDB() {
       await client.query("INSERT INTO settings (key, value) VALUES ('admin_password', $1)", [defaultHash])
     }
 
+    // Seed default edit password if not exists
+    const editPwResult = await client.query("SELECT key FROM settings WHERE key = 'edit_password'")
+    if (editPwResult.rows.length === 0) {
+      await client.query("INSERT INTO settings (key, value) VALUES ('edit_password', 'editar123')")
+    }
+
     console.log('Database tables initialized')
   } finally {
     client.release()
@@ -273,6 +279,52 @@ app.post('/api/auth/change-password', async (req, res) => {
   } catch (err) {
     console.error('Error changing password:', err)
     res.status(500).json({ error: 'Failed to change password' })
+  }
+})
+
+// GET /api/auth/edit-password - Get edit password (plain text)
+app.get('/api/auth/edit-password', async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'edit_password'")
+    res.json({ password: result.rows[0]?.value || '' })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to get edit password' })
+  }
+})
+
+// POST /api/auth/edit-password - Set edit password (plain text)
+app.post('/api/auth/edit-password', async (req, res) => {
+  const { password } = req.body
+  if (!password || password.length < 3) {
+    return res.status(400).json({ error: 'Password must be at least 3 characters' })
+  }
+  try {
+    await pool.query(
+      "INSERT INTO settings (key, value) VALUES ('edit_password', $1) ON CONFLICT (key) DO UPDATE SET value = $1",
+      [password]
+    )
+    res.json({ success: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to set edit password' })
+  }
+})
+
+// POST /api/auth/verify-edit-password - Verify edit password
+app.post('/api/auth/verify-edit-password', async (req, res) => {
+  const { password } = req.body
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' })
+  }
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'edit_password'")
+    const stored = result.rows[0]?.value || ''
+    if (password === stored) {
+      res.json({ success: true })
+    } else {
+      res.status(401).json({ error: 'Invalid edit password' })
+    }
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to verify edit password' })
   }
 })
 

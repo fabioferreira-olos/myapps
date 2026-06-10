@@ -107,3 +107,28 @@ export async function changePassword(currentPassword: string, newPassword: strin
   }
   return { success: true }
 }
+
+export async function getEditPassword(): Promise<string> {
+  const res = await fetch(`${API_BASE}/auth/edit-password`)
+  if (!res.ok) return ''
+  const data = await res.json()
+  return data.password || ''
+}
+
+export async function setEditPassword(password: string): Promise<boolean> {
+  const res = await fetch(`${API_BASE}/auth/edit-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password }),
+  })
+  return res.ok
+}
+
+export async function verifyEditPassword(password: string): Promise<boolean> {
+  const res = await fetch(`${API_BASE}/auth/verify-edit-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password }),
+  })
+  return res.ok
+}

@@ -314,7 +314,7 @@ export async function exportToPdf(doc: RCADocument): Promise<void> {
   }
 
   // ========== Considerations (may need new page) ==========
-  if (doc.considerations) {
+  if (doc.considerations && stripHtml(doc.considerations).trim()) {
     checkPageBreak(30)
     addSectionTitle('Considerações')
     addText(doc.considerations)

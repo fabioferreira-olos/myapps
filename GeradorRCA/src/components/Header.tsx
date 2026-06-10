@@ -23,7 +23,6 @@ function validateDocument(doc: any): string[] {
   if (!doc.rootCause || doc.rootCause.replace(/<[^>]*>/g, '').length < minLen) errors.push('Causa Raiz (mín. 5 caracteres)')
   if (doc.correctiveActions.length === 0) errors.push('Ações Corretivas (pelo menos 1)')
   if (doc.correctiveActions.some((a: any) => !a.actionType)) errors.push('Tipo da Ação Corretiva')
-  if (!doc.considerations || doc.considerations.replace(/<[^>]*>/g, '').length < minLen) errors.push('Considerações Finais (mín. 5 caracteres)')
   return errors
 }
 

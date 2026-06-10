@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, FileDown, FileText, Calendar, Pencil, Plus } from 'lucide-react'
-import { fetchRCAs, fetchRCA, RCASummary } from '../services/apiService'
+import { ArrowLeft, FileDown, FileText, Calendar, Pencil, Plus, Lock } from 'lucide-react'
+import { fetchRCAs, fetchRCA, RCASummary, verifyEditPassword } from '../services/apiService'
 import { exportToPdf } from '../services/exportPdf'
 import { exportToDocx } from '../services/exportDocx'
 import { useRCAStore } from '../context/RCAContext'
@@ -12,6 +12,9 @@ export default function RCAList() {
   const [rcas, setRcas] = useState<RCASummary[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState<string | null>(null)
+  const [editTarget, setEditTarget] = useState<string | null>(null)
+  const [editPwInput, setEditPwInput] = useState('')
+  const [editPwError, setEditPwError] = useState('')
   const [dateFrom, setDateFrom] = useState(() => {
     const now = new Date()
     return `${now.getFullYear()}-01-01`
@@ -72,10 +75,23 @@ export default function RCAList() {
   }
 
   const handleEdit = async (id: string) => {
+    setEditTarget(id)
+    setEditPwInput('')
+    setEditPwError('')
+  }
+
+  const handleEditConfirm = async () => {
+    if (!editTarget) return
+    const valid = await verifyEditPassword(editPwInput)
+    if (!valid) {
+      setEditPwError('Senha incorreta')
+      return
+    }
     try {
-      const record = await fetchRCA(id)
-      loadDocument(record.data, id)
-      setRcaId(id)
+      const record = await fetchRCA(editTarget)
+      loadDocument(record.data, editTarget)
+      setRcaId(editTarget)
+      setEditTarget(null)
       navigate('/')
     } catch (err) {
       console.error('Error loading RCA for edit:', err)
@@ -222,6 +238,46 @@ export default function RCAList() {
           </div>
         )}
       </div>
+
+      {/* Edit password modal */}
+      {editTarget && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <Lock className="w-5 h-5 text-primary-600" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Senha de Edição
+              </h3>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+              Digite a senha para editar a RCA <strong>{editTarget}</strong>
+            </p>
+            <input
+              type="password"
+              value={editPwInput}
+              onChange={(e) => { setEditPwInput(e.target.value); setEditPwError('') }}
+              onKeyDown={(e) => e.key === 'Enter' && handleEditConfirm()}
+              className="input-field mb-2"
+              placeholder="Senha de edição"
+              autoFocus
+            />
+            {editPwError && (
+              <p className="text-sm text-red-600 mb-3">{editPwError}</p>
+            )}
+            <div className="flex gap-2 mt-4">
+              <button onClick={handleEditConfirm} className="btn-primary flex-1">
+                Confirmar
+              </button>
+              <button
+                onClick={() => { setEditTarget(null); setEditPwInput(''); setEditPwError('') }}
+                className="btn-secondary flex-1"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
