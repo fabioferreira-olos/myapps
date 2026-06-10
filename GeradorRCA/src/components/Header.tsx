@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileText, Eye, EyeOff, Settings, RotateCcw, Save, Database, List } from 'lucide-react'
+import { FileText, Eye, EyeOff, Settings, RotateCcw, Save, Database, List, HelpCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
 import { useRCAStore } from '../context/RCAContext'
@@ -141,6 +141,14 @@ export default function Header() {
           </button>
 
           <ThemeToggle />
+
+          <button
+            onClick={() => navigate('/guia')}
+            className="btn-secondary flex items-center gap-2 text-sm"
+            title="Guia de Uso"
+          >
+            <HelpCircle className="w-4 h-4" />
+          </button>
         </div>
       </div>
 
