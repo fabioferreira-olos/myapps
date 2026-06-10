@@ -39,7 +39,7 @@ export default function RichTextEditor({ value, onChange, placeholder, aiField }
 
   return (
     <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
-      <div className="flex items-center gap-1 border-b border-gray-300 dark:border-gray-600 p-2 bg-gray-50 dark:bg-gray-750">
+      <div className="flex items-center gap-1 border-b border-gray-300 dark:border-gray-600 p-2 bg-gray-50 dark:bg-gray-700">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}

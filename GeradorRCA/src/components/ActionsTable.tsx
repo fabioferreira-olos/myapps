@@ -30,7 +30,7 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-100 dark:bg-gray-750">
+              <tr className="bg-gray-100 dark:bg-gray-700">
                 <th className="text-left p-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">
                   Descrição
                 </th>
@@ -48,7 +48,7 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
             </thead>
             <tbody>
               {actions.map((action) => (
-                <tr key={action.id} className="group hover:bg-gray-50 dark:hover:bg-gray-750">
+                <tr key={action.id} className="group hover:bg-gray-50 dark:hover:bg-gray-700/50">
                   <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
                     <input
                       type="text"
