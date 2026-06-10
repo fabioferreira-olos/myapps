@@ -9,6 +9,7 @@ import {
   Shield,
   CheckCircle,
   MessageSquare,
+  X,
 } from 'lucide-react'
 import { RCASection } from '../types/rca'
 import RichTextEditor from './RichTextEditor'
@@ -195,7 +196,7 @@ export default function RCAForm() {
         {activeSection === 'impact' && (
           <div className="space-y-4 max-w-3xl">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Impacto</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               <div>
                 <label className="label">Clientes Afetados</label>
                 <ClientSelector
@@ -214,6 +215,29 @@ export default function RCAForm() {
                 />
               </div>
             </div>
+            {/* Selected clients tags */}
+            {doc.affectedClients && (
+              <div className="flex flex-wrap gap-1.5">
+                {doc.affectedClients.split(', ').filter(Boolean).map((name) => (
+                  <span
+                    key={name}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200"
+                  >
+                    {name}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const current = doc.affectedClients.split(', ').filter(Boolean)
+                        updateField('affectedClients', current.filter((c) => c !== name).join(', '))
+                      }}
+                      className="hover:text-primary-600 dark:hover:text-primary-100"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
             <div>
               <label className="label">Descrição do Impacto nos Clientes</label>
               <RichTextEditor

@@ -51,27 +51,6 @@ export default function ClientSelector({ selected, onChange }: ClientSelectorPro
 
   return (
     <div className="space-y-2">
-      {/* Selected clients as tags */}
-      {selected.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-2">
-          {selected.map((name) => (
-            <span
-              key={name}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200"
-            >
-              {name}
-              <button
-                type="button"
-                onClick={() => removeClient(name)}
-                className="hover:text-primary-600 dark:hover:text-primary-100"
-              >
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-
       {/* Search input */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
