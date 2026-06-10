@@ -8,7 +8,7 @@ import {
 } from 'docx'
 import { saveAs } from 'file-saver'
 import { RCADocument } from '../types/rca'
-import { formatDateTime, getStatusLabel, stripHtml } from '../utils/formatters'
+import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml } from '../utils/formatters'
 
 const COMPANY_NAME = 'Olos Tecnologia'
 const COMPANY_ADDRESS = 'Torre Milano - Av. Francisco Matarazzo, 1400 - 13°Andar - Água Branca, São Paulo/SP - CEP 05001-903'
@@ -142,6 +142,12 @@ export async function exportToDocx(doc: RCADocument): Promise<void> {
   if (doc.affectedEnvironments) {
     addField('Ambientes Afetados', doc.affectedEnvironments)
   }
+  if (doc.recurrence) {
+    addField('Reincidência', getRecurrenceLabel(doc.recurrence))
+  }
+  if (doc.unavailability) {
+    addField('Indisponibilidade', getUnavailabilityLabel(doc.unavailability))
+  }
 
   children.push(new Paragraph({ spacing: { after: 200 } }))
 
@@ -193,7 +199,7 @@ export async function exportToDocx(doc: RCADocument): Promise<void> {
         new Paragraph({
           children: [
             new TextRun({
-              text: `(Responsável: ${action.responsible || 'N/A'} / Status: ${getStatusLabel(action.status)} / Data: ${action.deadline || 'N/A'})`,
+              text: `(Responsável: ${action.responsible || 'N/A'} / Status: ${getStatusLabel(action.status)} / Tipo: ${getActionTypeLabel(action.actionType || '')} / Data: ${action.deadline || 'N/A'})`,
               size: 18,
               color: '666666',
               italics: true,

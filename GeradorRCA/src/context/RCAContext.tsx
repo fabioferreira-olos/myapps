@@ -19,6 +19,8 @@ function createEmptyRCA(): RCADocument {
     endDate: '',
     totalDowntime: '',
     affectedEnvironments: '',
+    recurrence: '',
+    unavailability: '',
     affectedClients: '',
     affectedServices: '',
     clientImpactDescription: '',
@@ -112,7 +114,7 @@ export const useRCAStore = create<RCAStore>((set) => ({
         ...state.document,
         correctiveActions: [
           ...state.document.correctiveActions,
-          { id: generateId(), description: '', responsible: '', deadline: '', status: 'pending' },
+          { id: generateId(), description: '', responsible: '', deadline: '', status: 'pending', actionType: '' },
         ],
       },
     })),

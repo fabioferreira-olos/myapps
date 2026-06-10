@@ -8,9 +8,10 @@ interface ActionsTableProps {
   onAdd: () => void
   onUpdate: (id: string, field: keyof ActionItem, value: string) => void
   onRemove: (id: string) => void
+  showActionType?: boolean
 }
 
-export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove }: ActionsTableProps) {
+export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove, showActionType }: ActionsTableProps) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -43,6 +44,11 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
                 <th className="text-left p-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 w-36">
                   Status
                 </th>
+                {showActionType && (
+                  <th className="text-left p-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 w-36">
+                    Tipo *
+                  </th>
+                )}
                 <th className="p-3 w-10 border-b border-gray-200 dark:border-gray-600"></th>
               </tr>
             </thead>
@@ -86,6 +92,19 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
                       <option value="completed">Concluído</option>
                     </select>
                   </td>
+                  {showActionType && (
+                    <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
+                      <select
+                        value={action.actionType || ''}
+                        onChange={(e) => onUpdate(action.id, 'actionType', e.target.value)}
+                        className="input-field text-sm"
+                      >
+                        <option value="" disabled>Selecione...</option>
+                        <option value="definitive">Definitiva</option>
+                        <option value="workaround">Contorno</option>
+                      </select>
+                    </td>
+                  )}
                   <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
                     <button
                       onClick={() => onRemove(action.id)}

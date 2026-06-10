@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf'
 import { RCADocument } from '../types/rca'
-import { formatDateTime, getStatusLabel, stripHtml } from '../utils/formatters'
+import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml } from '../utils/formatters'
 
 const COMPANY_NAME = 'Olos Tecnologia'
 const COMPANY_ADDRESS = 'Torre Milano - Av. Francisco Matarazzo,\n1400 - 13°Andar - Água Branca,\nSão Paulo/SP - CEP 05001-903'
@@ -199,6 +199,12 @@ export async function exportToPdf(doc: RCADocument): Promise<void> {
   if (doc.affectedEnvironments) {
     addField('Ambientes Afetados', doc.affectedEnvironments)
   }
+  if (doc.recurrence) {
+    addField('Reincidência', getRecurrenceLabel(doc.recurrence))
+  }
+  if (doc.unavailability) {
+    addField('Indisponibilidade', getUnavailabilityLabel(doc.unavailability))
+  }
 
   y += 3
 
@@ -266,7 +272,7 @@ export async function exportToPdf(doc: RCADocument): Promise<void> {
         y += 4.2
       }
       // Status line
-      const statusLine = `(Responsável: ${action.responsible || 'N/A'} / Status: ${getStatusLabel(action.status)} / Data: ${action.deadline || 'N/A'})`
+      const statusLine = `(Responsável: ${action.responsible || 'N/A'} / Status: ${getStatusLabel(action.status)} / Tipo: ${getActionTypeLabel(action.actionType || '')} / Data: ${action.deadline || 'N/A'})`
       pdf.setFontSize(8)
       pdf.setTextColor(100, 100, 100)
       const statusLines = pdf.splitTextToSize(statusLine, contentWidth)

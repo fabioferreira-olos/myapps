@@ -30,6 +30,31 @@ export function getStatusLabel(status: string): string {
   return labels[status] || status
 }
 
+export function getRecurrenceLabel(value: string): string {
+  const labels: Record<string, string> = {
+    yes: 'Sim',
+    no: 'Não',
+  }
+  return labels[value] || ''
+}
+
+export function getUnavailabilityLabel(value: string): string {
+  const labels: Record<string, string> = {
+    none: 'Nenhuma',
+    partial: 'Parcial',
+    total: 'Total',
+  }
+  return labels[value] || ''
+}
+
+export function getActionTypeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    definitive: 'Definitiva',
+    workaround: 'Contorno',
+  }
+  return labels[value] || ''
+}
+
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',

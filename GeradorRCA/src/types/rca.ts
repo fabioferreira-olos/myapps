@@ -10,6 +10,7 @@ export interface ActionItem {
   responsible: string;
   deadline: string;
   status: 'pending' | 'in_progress' | 'completed';
+  actionType?: 'definitive' | 'workaround' | '';
 }
 
 export interface RCADocument {
@@ -28,6 +29,8 @@ export interface RCADocument {
   endDate: string;
   totalDowntime: string;
   affectedEnvironments: string;
+  recurrence: 'yes' | 'no' | '';
+  unavailability: 'none' | 'partial' | 'total' | '';
 
   // Impact
   affectedClients: string;

@@ -192,6 +192,31 @@ export default function RCAForm() {
                   placeholder="Ex: Produção, Homologação"
                 />
               </div>
+              <div>
+                <label className="label">Reincidência *</label>
+                <select
+                  value={doc.recurrence}
+                  onChange={(e) => updateField('recurrence', e.target.value)}
+                  className="input-field"
+                >
+                  <option value="" disabled>Selecione...</option>
+                  <option value="yes">Sim</option>
+                  <option value="no">Não</option>
+                </select>
+              </div>
+              <div>
+                <label className="label">Indisponibilidade *</label>
+                <select
+                  value={doc.unavailability}
+                  onChange={(e) => updateField('unavailability', e.target.value)}
+                  className="input-field"
+                >
+                  <option value="" disabled>Selecione...</option>
+                  <option value="none">Nenhuma</option>
+                  <option value="partial">Parcial</option>
+                  <option value="total">Total</option>
+                </select>
+              </div>
             </div>
           </div>
         )}
@@ -254,6 +279,7 @@ export default function RCAForm() {
             onAdd={addCorrectiveAction}
             onUpdate={updateCorrectiveAction}
             onRemove={removeCorrectiveAction}
+            showActionType
           />
         )}
 
