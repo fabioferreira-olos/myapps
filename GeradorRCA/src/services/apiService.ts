@@ -78,3 +78,8 @@ export async function updateRCA(id: string, data: any): Promise<{ id: string; up
   if (!res.ok) throw new Error('Failed to update RCA')
   return res.json()
 }
+
+export async function deleteRCA(id: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/rcas/${id}`, { method: 'DELETE' })
+  if (!res.ok) throw new Error('Failed to delete RCA')
+}

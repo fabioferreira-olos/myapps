@@ -187,6 +187,21 @@ app.put('/api/rcas/:id', async (req, res) => {
   }
 })
 
+// DELETE /api/rcas/:id - Delete an RCA
+app.delete('/api/rcas/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    const result = await pool.query('DELETE FROM rcas WHERE id = $1 RETURNING id', [id])
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'RCA not found' })
+    }
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Error deleting RCA:', err)
+    res.status(500).json({ error: 'Failed to delete RCA' })
+  }
+})
+
 // ========== HEALTH ==========
 
 app.get('/api/health', async (req, res) => {

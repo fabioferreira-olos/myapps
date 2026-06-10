@@ -4,7 +4,7 @@ import { ArrowLeft, Save, Trash2, Wifi, WifiOff, Lock, Eye, EyeOff, Plus, X } fr
 import { useAIConfigStore } from '../context/RCAContext'
 import { aiService } from '../services/aiService'
 import { AIConfig } from '../types/rca'
-import { fetchClients, createClient, deleteClient, Client } from '../services/apiService'
+import { fetchClients, createClient, deleteClient, Client, fetchRCAs, deleteRCA, RCASummary } from '../services/apiService'
 
 export default function AdminPanel() {
   const navigate = useNavigate()
@@ -29,6 +29,10 @@ export default function AdminPanel() {
   const [newClientName, setNewClientName] = useState('')
   const [clientsLoading, setClientsLoading] = useState(false)
 
+  // RCA management state
+  const [rcas, setRcas] = useState<RCASummary[]>([])
+  const [rcasLoading, setRcasLoading] = useState(false)
+
   useEffect(() => {
     loadConfig()
   }, [])
@@ -45,6 +49,7 @@ export default function AdminPanel() {
       setAuthenticated(true)
       setPasswordError('')
       loadClients()
+      loadRCAs()
     } else {
       setPasswordError('Senha incorreta')
     }
@@ -64,8 +69,12 @@ export default function AdminPanel() {
 
   const handleAddClient = async () => {
     if (!newClientName.trim()) return
+    const names = newClientName.split(',').map(n => n.trim()).filter(n => n.length > 0)
+    if (names.length === 0) return
     try {
-      await createClient(newClientName.trim())
+      for (const name of names) {
+        await createClient(name)
+      }
       setNewClientName('')
       await loadClients()
     } catch (err) {
@@ -80,6 +89,28 @@ export default function AdminPanel() {
       await loadClients()
     } catch (err) {
       console.error('Failed to delete client:', err)
+    }
+  }
+
+  const loadRCAs = async () => {
+    setRcasLoading(true)
+    try {
+      const data = await fetchRCAs()
+      setRcas(data)
+    } catch (err) {
+      console.error('Failed to load RCAs:', err)
+    } finally {
+      setRcasLoading(false)
+    }
+  }
+
+  const handleDeleteRCA = async (id: string) => {
+    if (!confirm(`Tem certeza que deseja DELETAR a RCA ${id}? Esta ação é irreversível.`)) return
+    try {
+      await deleteRCA(id)
+      await loadRCAs()
+    } catch (err) {
+      console.error('Failed to delete RCA:', err)
     }
   }
 
@@ -305,7 +336,7 @@ export default function AdminPanel() {
               onChange={(e) => setNewClientName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddClient()}
               className="input-field flex-1"
-              placeholder="Nome do novo cliente..."
+              placeholder="Cliente1, Cliente2, Cliente3..."
             />
             <button
               onClick={handleAddClient}
@@ -316,6 +347,9 @@ export default function AdminPanel() {
               Adicionar
             </button>
           </div>
+          <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+            Separe múltiplos clientes por vírgula
+          </p>
 
           {/* Client list */}
           {clientsLoading ? (
@@ -336,6 +370,47 @@ export default function AdminPanel() {
                     title="Remover cliente"
                   >
                     <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* RCA Management */}
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4">
+          Gerenciar RCAs
+        </h2>
+        <div className="card space-y-4">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+              ⚠️ Cuidado: a exclusão de RCAs é permanente e não pode ser desfeita.
+            </p>
+          </div>
+
+          {rcasLoading ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Carregando...</p>
+          ) : rcas.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Nenhuma RCA gravada</p>
+          ) : (
+            <div className="border border-gray-200 dark:border-gray-600 rounded-lg divide-y divide-gray-200 dark:divide-gray-600">
+              {rcas.map((rca) => (
+                <div
+                  key={rca.id}
+                  className="flex items-center justify-between px-4 py-2.5"
+                >
+                  <div>
+                    <span className="text-sm font-mono font-semibold text-gray-800 dark:text-gray-200">{rca.id}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                      {rca.title || 'Sem título'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteRCA(rca.id)}
+                    className="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                    title="Deletar RCA"
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               ))}
