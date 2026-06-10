@@ -38,6 +38,8 @@ interface RCAStore {
   showPreview: boolean
   aiPanelOpen: boolean
   aiTargetField: string | null
+  rcaId: string | null
+  savedAt: string | null
 
   setActiveSection: (section: RCASection) => void
   setShowPreview: (show: boolean) => void
@@ -59,6 +61,11 @@ interface RCAStore {
   updatePreventiveAction: (id: string, field: keyof ActionItem, value: string) => void
   removePreventiveAction: (id: string) => void
 
+  // Persistence
+  setRcaId: (id: string | null) => void
+  setSavedAt: (date: string | null) => void
+  loadDocument: (doc: RCADocument, id?: string | null) => void
+
   // Reset
   resetDocument: () => void
 }
@@ -69,6 +76,8 @@ export const useRCAStore = create<RCAStore>((set) => ({
   showPreview: false,
   aiPanelOpen: false,
   aiTargetField: null,
+  rcaId: null,
+  savedAt: null,
 
   setActiveSection: (section) => set({ activeSection: section }),
   setShowPreview: (show) => set({ showPreview: show }),
@@ -166,7 +175,11 @@ export const useRCAStore = create<RCAStore>((set) => ({
       },
     })),
 
-  resetDocument: () => set({ document: createEmptyRCA() }),
+  setRcaId: (id) => set({ rcaId: id }),
+  setSavedAt: (date) => set({ savedAt: date }),
+  loadDocument: (doc, id = null) => set({ document: doc, rcaId: id, savedAt: null }),
+
+  resetDocument: () => set({ document: createEmptyRCA(), rcaId: null, savedAt: null }),
 }))
 
 // AI Config Store

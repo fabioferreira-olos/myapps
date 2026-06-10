@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import Header from './Header'
 import RCAForm from './RCAForm'
 import RCAPreview from './RCAPreview'
@@ -5,7 +6,17 @@ import AIAssistant from './AIAssistant'
 import { useRCAStore } from '../context/RCAContext'
 
 export default function Layout() {
-  const { showPreview } = useRCAStore()
+  const { showPreview, loadDocument } = useRCAStore()
+
+  useEffect(() => {
+    const draft = localStorage.getItem('rcagen-draft')
+    if (draft) {
+      try {
+        const parsed = JSON.parse(draft)
+        loadDocument(parsed)
+      } catch {}
+    }
+  }, [])
 
   return (
     <div className="h-screen flex flex-col bg-gray-50 dark:bg-gray-900">

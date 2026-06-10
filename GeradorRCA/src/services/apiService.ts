@@ -6,6 +6,24 @@ export interface Client {
   active: boolean
 }
 
+export interface RCASummary {
+  id: string
+  title: string
+  incident_id: string
+  affected_clients: string
+  created_at: string
+  updated_at: string
+}
+
+export interface RCARecord {
+  id: string
+  data: any
+  created_at: string
+  updated_at: string
+}
+
+// ========== Clients ==========
+
 export async function fetchClients(): Promise<Client[]> {
   const res = await fetch(`${API_BASE}/clients`)
   if (!res.ok) throw new Error('Failed to fetch clients')
@@ -25,4 +43,38 @@ export async function createClient(name: string): Promise<Client> {
 export async function deleteClient(id: number): Promise<void> {
   const res = await fetch(`${API_BASE}/clients/${id}`, { method: 'DELETE' })
   if (!res.ok) throw new Error('Failed to delete client')
+}
+
+// ========== RCAs ==========
+
+export async function fetchRCAs(): Promise<RCASummary[]> {
+  const res = await fetch(`${API_BASE}/rcas`)
+  if (!res.ok) throw new Error('Failed to fetch RCAs')
+  return res.json()
+}
+
+export async function fetchRCA(id: string): Promise<RCARecord> {
+  const res = await fetch(`${API_BASE}/rcas/${id}`)
+  if (!res.ok) throw new Error('Failed to fetch RCA')
+  return res.json()
+}
+
+export async function publishRCA(data: any): Promise<{ id: string; created_at: string }> {
+  const res = await fetch(`${API_BASE}/rcas`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data }),
+  })
+  if (!res.ok) throw new Error('Failed to publish RCA')
+  return res.json()
+}
+
+export async function updateRCA(id: string, data: any): Promise<{ id: string; updated_at: string }> {
+  const res = await fetch(`${API_BASE}/rcas/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data }),
+  })
+  if (!res.ok) throw new Error('Failed to update RCA')
+  return res.json()
 }
