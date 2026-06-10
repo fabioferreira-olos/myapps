@@ -1,8 +1,7 @@
 import { useState } from 'react'
-import { FileText, Eye, EyeOff, Settings, RotateCcw, Save, Database } from 'lucide-react'
+import { FileText, Eye, EyeOff, Settings, RotateCcw, Save, Database, List } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
-import ExportButtons from './ExportButtons'
 import { useRCAStore } from '../context/RCAContext'
 import { publishRCA, updateRCA } from '../services/apiService'
 
@@ -110,7 +109,14 @@ export default function Header() {
             <span className="hidden sm:inline">{showPreview ? 'Editar' : 'Preview'}</span>
           </button>
 
-          <ExportButtons />
+          <button
+            onClick={() => navigate('/rcas')}
+            className="btn-secondary flex items-center gap-2 text-sm"
+            title="Listar RCAs gravadas"
+          >
+            <List className="w-4 h-4" />
+            <span className="hidden sm:inline">Gerar RCA</span>
+          </button>
 
           <button
             onClick={() => {
