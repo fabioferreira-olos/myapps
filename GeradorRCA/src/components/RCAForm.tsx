@@ -43,7 +43,7 @@ export default function RCAForm() {
   return (
     <div className="flex h-full">
       {/* Sidebar Navigation */}
-      <nav className="w-56 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-850 overflow-y-auto">
+      <nav className="w-56 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 overflow-y-auto">
         <div className="py-4">
           {sections.map((section) => (
             <button
