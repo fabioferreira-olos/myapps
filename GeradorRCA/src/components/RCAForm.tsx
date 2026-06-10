@@ -14,6 +14,7 @@ import { RCASection } from '../types/rca'
 import RichTextEditor from './RichTextEditor'
 import TimelineEditor from './TimelineEditor'
 import ActionsTable from './ActionsTable'
+import ClientSelector from './ClientSelector'
 
 const sections: { id: RCASection; label: string; icon: React.ReactNode }[] = [
   { id: 'metadata', label: 'Informações Gerais', icon: <FileText className="w-4 h-4" /> },
@@ -227,12 +228,9 @@ export default function RCAForm() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="label">Clientes Afetados</label>
-                <input
-                  type="text"
-                  value={doc.affectedClients}
-                  onChange={(e) => updateField('affectedClients', e.target.value)}
-                  className="input-field"
-                  placeholder="Ex: Cliente A, Cliente B"
+                <ClientSelector
+                  selected={doc.affectedClients ? doc.affectedClients.split(', ').filter(Boolean) : []}
+                  onChange={(selected) => updateField('affectedClients', selected.join(', '))}
                 />
               </div>
               <div>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Save, Trash2, Wifi, WifiOff, Lock, Eye, EyeOff } from 'lucide-react'
+import { ArrowLeft, Save, Trash2, Wifi, WifiOff, Lock, Eye, EyeOff, Plus, X } from 'lucide-react'
 import { useAIConfigStore } from '../context/RCAContext'
 import { aiService } from '../services/aiService'
 import { AIConfig } from '../types/rca'
+import { fetchClients, createClient, deleteClient, Client } from '../services/apiService'
 
 export default function AdminPanel() {
   const navigate = useNavigate()
@@ -23,6 +24,11 @@ export default function AdminPanel() {
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
   const [saved, setSaved] = useState(false)
 
+  // Client management state
+  const [clients, setClients] = useState<Client[]>([])
+  const [newClientName, setNewClientName] = useState('')
+  const [clientsLoading, setClientsLoading] = useState(false)
+
   useEffect(() => {
     loadConfig()
   }, [])
@@ -38,8 +44,42 @@ export default function AdminPanel() {
     if (password === 'Olos@123!') {
       setAuthenticated(true)
       setPasswordError('')
+      loadClients()
     } else {
       setPasswordError('Senha incorreta')
+    }
+  }
+
+  const loadClients = async () => {
+    setClientsLoading(true)
+    try {
+      const data = await fetchClients()
+      setClients(data)
+    } catch (err) {
+      console.error('Failed to load clients:', err)
+    } finally {
+      setClientsLoading(false)
+    }
+  }
+
+  const handleAddClient = async () => {
+    if (!newClientName.trim()) return
+    try {
+      await createClient(newClientName.trim())
+      setNewClientName('')
+      await loadClients()
+    } catch (err) {
+      console.error('Failed to add client:', err)
+    }
+  }
+
+  const handleDeleteClient = async (id: number) => {
+    if (!confirm('Tem certeza que deseja remover este cliente?')) return
+    try {
+      await deleteClient(id)
+      await loadClients()
+    } catch (err) {
+      console.error('Failed to delete client:', err)
     }
   }
 
@@ -138,7 +178,7 @@ export default function AdminPanel() {
             Voltar
           </button>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Configurações de IA
+            Administração
           </h1>
         </div>
 
@@ -244,6 +284,63 @@ export default function AdminPanel() {
               Limpar
             </button>
           </div>
+        </div>
+
+        {/* Client Management */}
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4">
+          Cadastro de Clientes
+        </h2>
+        <div className="card space-y-4">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <p className="text-sm text-blue-800 dark:text-blue-200">
+              Gerencie os clientes disponíveis para seleção nos documentos RCA.
+            </p>
+          </div>
+
+          {/* Add new client */}
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newClientName}
+              onChange={(e) => setNewClientName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddClient()}
+              className="input-field flex-1"
+              placeholder="Nome do novo cliente..."
+            />
+            <button
+              onClick={handleAddClient}
+              disabled={!newClientName.trim()}
+              className="btn-primary flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar
+            </button>
+          </div>
+
+          {/* Client list */}
+          {clientsLoading ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Carregando...</p>
+          ) : clients.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum cliente cadastrado</p>
+          ) : (
+            <div className="border border-gray-200 dark:border-gray-600 rounded-lg divide-y divide-gray-200 dark:divide-gray-600">
+              {clients.map((client) => (
+                <div
+                  key={client.id}
+                  className="flex items-center justify-between px-4 py-2.5"
+                >
+                  <span className="text-sm text-gray-800 dark:text-gray-200">{client.name}</span>
+                  <button
+                    onClick={() => handleDeleteClient(client.id)}
+                    className="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                    title="Remover cliente"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
