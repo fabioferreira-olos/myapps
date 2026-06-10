@@ -63,7 +63,7 @@ export default function UserGuide() {
             <tbody>
               <tr>
                 <td><strong>Limpar/Nova</strong></td>
-                <td>Limpa todos os campos e inicia uma RCA do zero. Se estiver editando uma RCA existente, desvincula o ID e começa uma nova.</td>
+                <td>Limpa todos os campos localmente e inicia uma RCA do zero. Se estiver editando uma RCA existente, desvincula o ID e começa uma nova. <strong>Não altera nem deleta nada no banco de dados</strong> — a RCA original permanece intacta.</td>
               </tr>
               <tr>
                 <td><strong>Draft</strong></td>
