@@ -22,6 +22,7 @@ export default function RCAList() {
   const [dateTo, setDateTo] = useState(() => {
     return new Date().toISOString().split('T')[0]
   })
+  const [clientFilter, setClientFilter] = useState('')
 
   useEffect(() => {
     loadRCAs()
@@ -39,14 +40,27 @@ export default function RCAList() {
     }
   }
 
+  const allClients = useMemo(() => {
+    const clientSet = new Set<string>()
+    rcas.forEach((rca) => {
+      if (rca.affected_clients) {
+        rca.affected_clients.split(', ').forEach((c) => {
+          if (c.trim()) clientSet.add(c.trim())
+        })
+      }
+    })
+    return Array.from(clientSet).sort()
+  }, [rcas])
+
   const filtered = useMemo(() => {
     return rcas.filter((rca) => {
       const rcaDate = rca.created_at.split('T')[0]
       if (dateFrom && rcaDate < dateFrom) return false
       if (dateTo && rcaDate > dateTo) return false
+      if (clientFilter && (!rca.affected_clients || !rca.affected_clients.includes(clientFilter))) return false
       return true
     })
-  }, [rcas, dateFrom, dateTo])
+  }, [rcas, dateFrom, dateTo, clientFilter])
 
   const handleExportPdf = async (id: string) => {
     setExporting(id + '-pdf')
@@ -136,7 +150,7 @@ export default function RCAList() {
           </button>
         </div>
 
-        {/* Date filters */}
+        {/* Filters */}
         <div className="card mb-6">
           <div className="flex flex-wrap items-end gap-4">
             <div>
@@ -163,6 +177,19 @@ export default function RCAList() {
                 />
               </div>
             </div>
+            <div>
+              <label className="label">Cliente</label>
+              <select
+                value={clientFilter}
+                onChange={(e) => setClientFilter(e.target.value)}
+                className="input-field"
+              >
+                <option value="">Todos os clientes</option>
+                {allClients.map((client) => (
+                  <option key={client} value={client}>{client}</option>
+                ))}
+              </select>
+            </div>
             <div className="text-sm text-gray-500 dark:text-gray-400 pb-2">
               {filtered.length} RCA{filtered.length !== 1 ? 's' : ''} encontrada{filtered.length !== 1 ? 's' : ''}
             </div>
@@ -176,8 +203,8 @@ export default function RCAList() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
-            <p className="text-lg">Nenhuma RCA encontrada</p>
-            <p className="text-sm mt-1">Ajuste os filtros de data ou grave uma nova RCA</p>
+            <p className="text-lg">Não há RCAs para o cliente e período selecionado</p>
+            <p className="text-sm mt-1">Ajuste os filtros ou grave uma nova RCA</p>
           </div>
         ) : (
           <div className="space-y-3">
