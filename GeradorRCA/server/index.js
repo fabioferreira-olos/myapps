@@ -384,6 +384,75 @@ app.get('/api/reports/downtime-by-client', async (req, res) => {
   }
 })
 
+// GET /api/reports/sla-by-client?from=YYYY-MM-DD&to=YYYY-MM-DD
+app.get('/api/reports/sla-by-client', async (req, res) => {
+  const { from, to } = req.query
+  try {
+    // Calculate total hours in the selected period
+    const startDate = from ? new Date(from) : new Date(new Date().getFullYear(), 0, 1)
+    const endDate = to ? new Date(to + 'T23:59:59') : new Date()
+    const totalPeriodMs = endDate.getTime() - startDate.getTime()
+    const totalPeriodHours = totalPeriodMs / 3600000
+
+    if (totalPeriodHours <= 0) {
+      return res.json([])
+    }
+
+    let query = 'SELECT id, data, created_at FROM rcas'
+    const params = []
+    const conditions = []
+
+    if (from) {
+      params.push(from)
+      conditions.push(`created_at >= $${params.length}::date`)
+    }
+    if (to) {
+      params.push(to + 'T23:59:59')
+      conditions.push(`created_at <= $${params.length}::timestamp`)
+    }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ')
+    }
+
+    const result = await pool.query(query, params)
+
+    // Aggregate downtime per client
+    const clientDowntime = {}
+
+    for (const row of result.rows) {
+      const data = row.data
+      if (!data.startDate || !data.endDate || !data.affectedClients) continue
+
+      const start = new Date(data.startDate)
+      const end = new Date(data.endDate)
+      const diffMs = end.getTime() - start.getTime()
+      if (diffMs <= 0) continue
+
+      const hours = diffMs / 3600000
+      const clients = data.affectedClients.split(', ').map(c => c.trim()).filter(Boolean)
+
+      for (const client of clients) {
+        clientDowntime[client] = (clientDowntime[client] || 0) + hours
+      }
+    }
+
+    // Calculate SLA % for each client: (totalHours - downtimeHours) / totalHours * 100
+    const report = Object.entries(clientDowntime)
+      .map(([name, downtime]) => ({
+        name,
+        sla: parseFloat((((totalPeriodHours - downtime) / totalPeriodHours) * 100).toFixed(4)),
+        downtime: parseFloat(downtime.toFixed(2)),
+      }))
+      .sort((a, b) => a.sla - b.sla)
+
+    res.json({ totalPeriodHours: parseFloat(totalPeriodHours.toFixed(2)), clients: report })
+  } catch (err) {
+    console.error('Error generating SLA report:', err)
+    res.status(500).json({ error: 'Failed to generate SLA report' })
+  }
+})
+
 // ========== HEALTH ==========
 
 app.get('/api/health', async (req, res) => {
