@@ -32,7 +32,8 @@ export default function Reports() {
   const [slaChartType, setSlaChartType] = useState<'pie' | 'bar'>('bar')
   const [dateFrom, setDateFrom] = useState(() => {
     const now = new Date()
-    return `${now.getFullYear()}-01-01`
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+    return thirtyDaysAgo.toISOString().split('T')[0]
   })
   const [dateTo, setDateTo] = useState(() => {
     return new Date().toISOString().split('T')[0]
@@ -40,7 +41,7 @@ export default function Reports() {
 
   useEffect(() => {
     loadReports()
-  }, [dateFrom, dateTo])
+  }, [])
 
   const loadReports = async () => {
     setLoading(true)
@@ -142,9 +143,21 @@ export default function Reports() {
                 />
               </div>
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 pb-2">
-              Período total: <strong>{totalPeriodHours.toFixed(0)}h</strong>
+            <div>
+              <label className="label">&nbsp;</label>
+              <button
+                onClick={loadReports}
+                disabled={loading}
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 disabled:opacity-50"
+              >
+                {loading ? 'Carregando...' : 'SELECIONAR'}
+              </button>
             </div>
+            {totalPeriodHours > 0 && (
+              <div className="text-sm text-gray-500 dark:text-gray-400 pb-2">
+                Período total: <strong>{totalPeriodHours.toFixed(0)}h</strong>
+              </div>
+            )}
           </div>
         </div>
 
