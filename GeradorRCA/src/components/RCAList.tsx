@@ -57,7 +57,7 @@ export default function RCAList() {
       const rcaDate = rca.created_at.split('T')[0]
       if (dateFrom && rcaDate < dateFrom) return false
       if (dateTo && rcaDate > dateTo) return false
-      if (clientFilter && (!rca.affected_clients || !rca.affected_clients.includes(clientFilter))) return false
+      if (clientFilter && (!rca.affected_clients || !rca.affected_clients.toLowerCase().includes(clientFilter.toLowerCase()))) return false
       return true
     })
   }, [rcas, dateFrom, dateTo, clientFilter])
@@ -179,16 +179,19 @@ export default function RCAList() {
             </div>
             <div>
               <label className="label">Cliente</label>
-              <select
+              <input
+                type="text"
                 value={clientFilter}
                 onChange={(e) => setClientFilter(e.target.value)}
                 className="input-field"
-              >
-                <option value="">Todos os clientes</option>
+                placeholder="Filtrar por cliente..."
+                list="client-list"
+              />
+              <datalist id="client-list">
                 {allClients.map((client) => (
-                  <option key={client} value={client}>{client}</option>
+                  <option key={client} value={client} />
                 ))}
-              </select>
+              </datalist>
             </div>
             <div className="text-sm text-gray-500 dark:text-gray-400 pb-2">
               {filtered.length} RCA{filtered.length !== 1 ? 's' : ''} encontrada{filtered.length !== 1 ? 's' : ''}
