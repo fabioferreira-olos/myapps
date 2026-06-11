@@ -4,6 +4,7 @@ import Layout from './components/Layout'
 import AdminPanel from './components/AdminPanel'
 import RCAList from './components/RCAList'
 import UserGuide from './components/UserGuide'
+import Reports from './components/Reports'
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="/rcas" element={<RCAList />} />
         <Route path="/guia" element={<UserGuide />} />
+        <Route path="/reports" element={<Reports />} />
       </Routes>
     </ThemeProvider>
   )

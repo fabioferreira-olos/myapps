@@ -328,6 +328,62 @@ app.post('/api/auth/verify-edit-password', async (req, res) => {
   }
 })
 
+// ========== REPORTS ==========
+
+// GET /api/reports/downtime-by-client?from=YYYY-MM-DD&to=YYYY-MM-DD
+app.get('/api/reports/downtime-by-client', async (req, res) => {
+  const { from, to } = req.query
+  try {
+    let query = 'SELECT id, data, created_at FROM rcas'
+    const params = []
+    const conditions = []
+
+    if (from) {
+      params.push(from)
+      conditions.push(`created_at >= $${params.length}::date`)
+    }
+    if (to) {
+      params.push(to + 'T23:59:59')
+      conditions.push(`created_at <= $${params.length}::timestamp`)
+    }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ')
+    }
+
+    const result = await pool.query(query, params)
+
+    // Aggregate downtime (in hours) per client
+    const clientDowntime = {}
+
+    for (const row of result.rows) {
+      const data = row.data
+      if (!data.startDate || !data.endDate || !data.affectedClients) continue
+
+      const start = new Date(data.startDate)
+      const end = new Date(data.endDate)
+      const diffMs = end.getTime() - start.getTime()
+      if (diffMs <= 0) continue
+
+      const hours = parseFloat((diffMs / 3600000).toFixed(2))
+      const clients = data.affectedClients.split(', ').map(c => c.trim()).filter(Boolean)
+
+      for (const client of clients) {
+        clientDowntime[client] = (clientDowntime[client] || 0) + hours
+      }
+    }
+
+    const report = Object.entries(clientDowntime)
+      .map(([name, hours]) => ({ name, hours: parseFloat(hours.toFixed(2)) }))
+      .sort((a, b) => b.hours - a.hours)
+
+    res.json(report)
+  } catch (err) {
+    console.error('Error generating report:', err)
+    res.status(500).json({ error: 'Failed to generate report' })
+  }
+})
+
 // ========== HEALTH ==========
 
 app.get('/api/health', async (req, res) => {

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { FileText, Eye, EyeOff, Settings, RotateCcw, Save, Database, List, HelpCircle } from 'lucide-react'
+import { FileText, Eye, EyeOff, Settings, RotateCcw, Save, Database, List, HelpCircle, BarChart3 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import ThemeToggle from './ThemeToggle'
 import { useRCAStore } from '../context/RCAContext'
@@ -129,6 +129,15 @@ export default function Header() {
           >
             <List className="w-4 h-4" />
             <span className="hidden sm:inline">Gerar RCA</span>
+          </button>
+
+          <button
+            onClick={() => navigate('/reports')}
+            className="btn-secondary flex items-center gap-2 text-sm"
+            title="Relatórios"
+          >
+            <BarChart3 className="w-4 h-4" />
+            <span className="hidden sm:inline">Relatórios</span>
           </button>
 
           <button
