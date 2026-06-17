@@ -19,6 +19,7 @@ export interface RCADocument {
   title: string;
   createdAt: string;
   createdBy: string;
+  reviewedBy: string;
 
   // Incident Info
   incidentId: string;

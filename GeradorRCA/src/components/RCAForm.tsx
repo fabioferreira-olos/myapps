@@ -101,6 +101,16 @@ export default function RCAForm() {
                 />
               </div>
               <div>
+                <label className="label">Revisado por</label>
+                <input
+                  type="text"
+                  value={doc.reviewedBy}
+                  onChange={(e) => updateField('reviewedBy', e.target.value)}
+                  className="input-field"
+                  placeholder="Nome do revisor"
+                />
+              </div>
+              <div>
                 <label className="label">Data de Criação</label>
                 <input
                   type="date"

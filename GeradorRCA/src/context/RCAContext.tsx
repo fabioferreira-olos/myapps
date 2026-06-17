@@ -11,6 +11,7 @@ function createEmptyRCA(): RCADocument {
     title: '',
     createdAt: new Date().toISOString().split('T')[0],
     createdBy: '',
+    reviewedBy: '',
     incidentId: '',
     description: '',
     startDate: '',
