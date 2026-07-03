@@ -1,9 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, PieChart as PieIcon, BarChart3, Calendar } from 'lucide-react'
-import {
-  PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
-} from 'recharts'
+import { ArrowLeft, Calendar, Clock, Shield } from 'lucide-react'
 
 interface DowntimeData {
   name: string
@@ -16,20 +13,12 @@ interface SLAData {
   downtime: number
 }
 
-const COLORS = [
-  '#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#8b5cf6',
-  '#ec4899', '#06b6d4', '#f97316', '#6366f1', '#14b8a6',
-  '#e11d48', '#84cc16', '#0ea5e9', '#d946ef', '#78716c',
-]
-
 export default function Reports() {
   const navigate = useNavigate()
   const [downtimeData, setDowntimeData] = useState<DowntimeData[]>([])
   const [slaData, setSlaData] = useState<SLAData[]>([])
   const [totalPeriodHours, setTotalPeriodHours] = useState(0)
   const [loading, setLoading] = useState(false)
-  const [downtimeChartType, setDowntimeChartType] = useState<'pie' | 'bar'>('pie')
-  const [slaChartType, setSlaChartType] = useState<'pie' | 'bar'>('bar')
   const [dateFrom, setDateFrom] = useState(() => {
     const now = new Date()
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
@@ -72,32 +61,41 @@ export default function Reports() {
 
   const totalDowntimeHours = downtimeData.reduce((sum, d) => sum + d.hours, 0)
 
-  const ChartTypeToggle = ({ value, onChange }: { value: 'pie' | 'bar'; onChange: (v: 'pie' | 'bar') => void }) => (
-    <div className="flex gap-1">
-      <button
-        onClick={() => onChange('pie')}
-        className={`p-1.5 rounded transition-colors ${
-          value === 'pie'
-            ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300'
-            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-        }`}
-        title="Pizza"
-      >
-        <PieIcon className="w-4 h-4" />
-      </button>
-      <button
-        onClick={() => onChange('bar')}
-        className={`p-1.5 rounded transition-colors ${
-          value === 'bar'
-            ? 'bg-primary-100 dark:bg-primary-900/40 text-primary-700 dark:text-primary-300'
-            : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'
-        }`}
-        title="Barras"
-      >
-        <BarChart3 className="w-4 h-4" />
-      </button>
-    </div>
-  )
+  const sortedDowntime = [...downtimeData].sort((a, b) => b.hours - a.hours)
+  const sortedSla = [...slaData].sort((a, b) => a.sla - b.sla)
+  const avgSla = slaData.length > 0 ? slaData.reduce((sum, d) => sum + d.sla, 0) / slaData.length : 0
+
+  function getSlaStatusBadge(sla: number) {
+    if (sla >= 99.9) {
+      return (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+          Saudável
+        </span>
+      )
+    }
+    if (sla >= 99) {
+      return (
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200">
+          Atenção
+        </span>
+      )
+    }
+    return (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200">
+        Crítico
+      </span>
+    )
+  }
+
+  function getPercentBadge(percent: number) {
+    if (percent >= 30) {
+      return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+    }
+    if (percent >= 15) {
+      return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
+    }
+    return 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
@@ -167,20 +165,18 @@ export default function Reports() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Report 1: Downtime by Client */}
+            {/* Report 1: Downtime by Client - Table */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-primary-600" />
                   Indisponibilidade por Cliente
                 </h2>
-                <div className="flex items-center gap-3">
-                  {downtimeData.length > 0 && (
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      Total: <strong>{totalDowntimeHours.toFixed(2)}h</strong>
-                    </span>
-                  )}
-                  <ChartTypeToggle value={downtimeChartType} onChange={setDowntimeChartType} />
-                </div>
+                {downtimeData.length > 0 && (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    Total: <strong className="text-gray-900 dark:text-white">{totalDowntimeHours.toFixed(2)}h</strong>
+                  </span>
+                )}
               </div>
 
               {downtimeData.length === 0 ? (
@@ -188,77 +184,76 @@ export default function Reports() {
                   <p>Nenhum dado de indisponibilidade encontrado para o período selecionado</p>
                 </div>
               ) : (
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <div className="flex-1 min-h-[350px]">
-                    <ResponsiveContainer width="100%" height={350}>
-                      {downtimeChartType === 'pie' ? (
-                        <PieChart>
-                          <Pie
-                            data={downtimeData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={true}
-                            label={({ name, hours }) => `${name} (${hours}h)`}
-                            outerRadius={120}
-                            dataKey="hours"
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">#</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Cliente</th>
+                        <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Indisponibilidade</th>
+                        <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">% do Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedDowntime.map((item, idx) => {
+                        const percent = totalDowntimeHours > 0 ? (item.hours / totalDowntimeHours) * 100 : 0
+                        return (
+                          <tr
+                            key={item.name}
+                            className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                           >
-                            {downtimeData.map((_, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip formatter={(value: number) => [`${value}h`, 'Indisponibilidade']} />
-                          <Legend />
-                        </PieChart>
-                      ) : (
-                        <BarChart data={downtimeData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} tick={{ fontSize: 12 }} />
-                          <YAxis label={{ value: 'Horas', angle: -90, position: 'insideLeft' }} />
-                          <Tooltip formatter={(value: number) => [`${value}h`, 'Indisponibilidade']} />
-                          <Bar dataKey="hours" name="Indisponibilidade (horas)">
-                            {downtimeData.map((_, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      )}
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="lg:w-64">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Detalhamento</h3>
-                    <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-gray-100 dark:bg-gray-700">
-                            <th className="text-left p-2 font-medium text-gray-700 dark:text-gray-300">Cliente</th>
-                            <th className="text-right p-2 font-medium text-gray-700 dark:text-gray-300">Horas</th>
+                            <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
+                              {idx + 1}
+                            </td>
+                            <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
+                              {item.name}
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono text-gray-900 dark:text-white">
+                              {item.hours.toFixed(2)}h
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPercentBadge(percent)}`}>
+                                {percent.toFixed(1)}%
+                              </span>
+                            </td>
                           </tr>
-                        </thead>
-                        <tbody>
-                          {downtimeData.map((item, idx) => (
-                            <tr key={item.name} className="border-t border-gray-100 dark:border-gray-700">
-                              <td className="p-2 text-gray-800 dark:text-gray-200">
-                                <span className="inline-block w-3 h-3 rounded-full mr-2" style={{ backgroundColor: COLORS[idx % COLORS.length] }} />
-                                {item.name}
-                              </td>
-                              <td className="p-2 text-right text-gray-800 dark:text-gray-200 font-mono">{item.hours.toFixed(2)}h</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                        )
+                      })}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
+                        <td className="py-3 px-4" colSpan={2}>
+                          <span className="font-semibold text-gray-900 dark:text-white">Total</span>
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono font-bold text-gray-900 dark:text-white">
+                          {totalDowntimeHours.toFixed(2)}h
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                            100%
+                          </span>
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
               )}
             </div>
 
-            {/* Report 2: SLA by Client */}
+            {/* Report 2: SLA by Client - Table */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-primary-600" />
                   SLA por Cliente
                 </h2>
-                <ChartTypeToggle value={slaChartType} onChange={setSlaChartType} />
+                {slaData.length > 0 && (
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    SLA médio: <strong className={`${avgSla >= 99.9 ? 'text-green-600 dark:text-green-400' : avgSla >= 99 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                      {avgSla.toFixed(2)}%
+                    </strong>
+                  </span>
+                )}
               </div>
 
               {slaData.length === 0 ? (
@@ -266,73 +261,74 @@ export default function Reports() {
                   <p>Nenhum dado de SLA encontrado para o período selecionado</p>
                 </div>
               ) : (
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <div className="flex-1 min-h-[350px]">
-                    <ResponsiveContainer width="100%" height={350}>
-                      {slaChartType === 'pie' ? (
-                        <PieChart>
-                          <Pie
-                            data={slaData}
-                            cx="50%"
-                            cy="50%"
-                            labelLine={true}
-                            label={({ name, sla }) => `${name} (${sla}%)`}
-                            outerRadius={120}
-                            dataKey="sla"
-                          >
-                            {slaData.map((_, index) => (
-                              <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip formatter={(value: number) => [`${value}%`, 'SLA']} />
-                          <Legend />
-                        </PieChart>
-                      ) : (
-                        <BarChart data={slaData} margin={{ top: 5, right: 30, left: 20, bottom: 60 }}>
-                          <CartesianGrid strokeDasharray="3 3" />
-                          <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} tick={{ fontSize: 12 }} />
-                          <YAxis domain={[95, 100]} label={{ value: 'SLA %', angle: -90, position: 'insideLeft' }} />
-                          <Tooltip formatter={(value: number) => [`${value}%`, 'SLA']} />
-                          <Bar dataKey="sla" name="SLA (%)">
-                            {slaData.map((item, index) => (
-                              <Cell key={`cell-${index}`} fill={item.sla >= 99.9 ? '#10b981' : item.sla >= 99 ? '#f59e0b' : '#ef4444'} />
-                            ))}
-                          </Bar>
-                        </BarChart>
-                      )}
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="lg:w-72">
-                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Detalhamento</h3>
-                    <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-gray-100 dark:bg-gray-700">
-                            <th className="text-left p-2 font-medium text-gray-700 dark:text-gray-300">Cliente</th>
-                            <th className="text-right p-2 font-medium text-gray-700 dark:text-gray-300">SLA</th>
-                            <th className="text-right p-2 font-medium text-gray-700 dark:text-gray-300">Down</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {slaData.map((item) => (
-                            <tr key={item.name} className="border-t border-gray-100 dark:border-gray-700">
-                              <td className="p-2 text-gray-800 dark:text-gray-200">{item.name}</td>
-                              <td className="p-2 text-right font-mono">
-                                <span className={`px-1.5 py-0.5 rounded text-xs font-medium ${
-                                  item.sla >= 99.9 ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
-                                  : item.sla >= 99 ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200 dark:border-gray-700">
+                        <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">#</th>
+                        <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Cliente</th>
+                        <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Downtime</th>
+                        <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">SLA</th>
+                        <th className="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sortedSla.map((item, idx) => (
+                        <tr
+                          key={item.name}
+                          className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                        >
+                          <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
+                            {idx + 1}
+                          </td>
+                          <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
+                            {item.name}
+                          </td>
+                          <td className="py-3 px-4 text-right font-mono text-gray-700 dark:text-gray-300">
+                            {item.downtime}h
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                              item.sla >= 99.9
+                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                                : item.sla >= 99
+                                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
                                   : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
-                                }`}>
-                                  {item.sla.toFixed(2)}%
-                                </span>
-                              </td>
-                              <td className="p-2 text-right text-gray-600 dark:text-gray-400 font-mono text-xs">{item.downtime}h</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
+                            }`}>
+                              {item.sla.toFixed(2)}%
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            {getSlaStatusBadge(item.sla)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
+                        <td className="py-3 px-4" colSpan={2}>
+                          <span className="font-semibold text-gray-900 dark:text-white">Média Geral</span>
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono text-gray-700 dark:text-gray-300">
+                          {(slaData.reduce((sum, d) => sum + d.downtime, 0)).toFixed(2)}h
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                            avgSla >= 99.9
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                              : avgSla >= 99
+                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
+                                : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+                          }`}>
+                            {avgSla.toFixed(2)}%
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          {getSlaStatusBadge(avgSla)}
+                        </td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
               )}
             </div>
