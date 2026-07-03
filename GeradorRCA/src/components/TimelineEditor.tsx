@@ -98,7 +98,7 @@ export default function TimelineEditor() {
           {sortedTimeline.map((entry, index) => (
             <div
               key={entry.id}
-              className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-750 rounded-lg border border-gray-200 dark:border-gray-600 group"
+              className="flex items-start gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 group"
             >
               <div className="flex-shrink-0 w-8 h-8 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center">
                 <span className="text-xs font-bold text-primary-700 dark:text-primary-300">
