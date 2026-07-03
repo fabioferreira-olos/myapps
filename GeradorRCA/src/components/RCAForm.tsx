@@ -1,5 +1,4 @@
 import { useRCAStore } from '../context/RCAContext'
-import { calculateDowntime } from '../utils/formatters'
 import {
   FileText,
   AlertTriangle,
@@ -136,44 +135,6 @@ export default function RCAForm() {
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="label">Data/Hora de Início</label>
-                <input
-                  type="datetime-local"
-                  value={doc.startDate}
-                  onChange={(e) => {
-                    updateField('startDate', e.target.value)
-                    if (e.target.value && doc.endDate) {
-                      updateField('totalDowntime', calculateDowntime(e.target.value, doc.endDate))
-                    }
-                  }}
-                  className="input-field"
-                />
-              </div>
-              <div>
-                <label className="label">Data/Hora de Término</label>
-                <input
-                  type="datetime-local"
-                  value={doc.endDate}
-                  onChange={(e) => {
-                    updateField('endDate', e.target.value)
-                    if (doc.startDate && e.target.value) {
-                      updateField('totalDowntime', calculateDowntime(doc.startDate, e.target.value))
-                    }
-                  }}
-                  className="input-field"
-                />
-              </div>
-              <div>
-                <label className="label">Tempo Total de Indisponibilidade</label>
-                <input
-                  type="text"
-                  value={doc.totalDowntime}
-                  readOnly
-                  className="input-field bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                  placeholder="Calculado automaticamente"
-                />
-              </div>
               <div>
                 <label className="label">Reincidência *</label>
                 <select

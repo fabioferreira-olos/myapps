@@ -1,8 +1,20 @@
 import { useRCAStore } from '../context/RCAContext'
-import { formatDateTime, getStatusLabel, getStatusColor } from '../utils/formatters'
+import { formatDateTime, getStatusLabel, getStatusColor, calculateDowntime } from '../utils/formatters'
+import { useMemo } from 'react'
 
 export default function RCAPreview() {
   const { document: doc } = useRCAStore()
+
+  const timelineStats = useMemo(() => {
+    const validEntries = doc.timeline.filter((e) => e.dateTime)
+    if (validEntries.length < 2) return null
+    const sorted = [...validEntries].sort(
+      (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+    )
+    const first = sorted[0].dateTime
+    const last = sorted[sorted.length - 1].dateTime
+    return { startDate: first, endDate: last, downtime: calculateDowntime(first, last) }
+  }, [doc.timeline])
 
   return (
     <div className="h-full overflow-y-auto bg-white dark:bg-gray-800 p-8">
@@ -32,11 +44,15 @@ export default function RCAPreview() {
         {/* Incident */}
         <Section title="Informações do Incidente">
           <Field label="Descrição" value={doc.description} />
-          <div className="grid grid-cols-2 gap-4 mt-3">
-            <Field label="Início" value={doc.startDate ? formatDateTime(doc.startDate) : ''} />
-            <Field label="Término" value={doc.endDate ? formatDateTime(doc.endDate) : ''} />
-            <Field label="Tempo de Indisponibilidade" value={doc.totalDowntime} />
-          </div>
+          {timelineStats && (
+            <div className="grid grid-cols-2 gap-4 mt-3">
+              <Field label="Início" value={formatDateTime(timelineStats.startDate)} />
+              <Field label="Término" value={formatDateTime(timelineStats.endDate)} />
+              {!doc.hideDowntime && (
+                <Field label="Tempo de Indisponibilidade" value={timelineStats.downtime} />
+              )}
+            </div>
+          )}
         </Section>
 
         {/* Impact */}

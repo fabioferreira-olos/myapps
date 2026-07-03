@@ -8,7 +8,7 @@ import {
 } from 'docx'
 import { saveAs } from 'file-saver'
 import { RCADocument } from '../types/rca'
-import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml } from '../utils/formatters'
+import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml, calculateDowntime } from '../utils/formatters'
 
 const COMPANY_NAME = 'Olos Tecnologia'
 const COMPANY_ADDRESS = 'Torre Milano - Av. Francisco Matarazzo, 1400 - 13°Andar - Água Branca, São Paulo/SP - CEP 05001-903'
@@ -29,6 +29,15 @@ export async function exportToDocx(doc: RCADocument, clientName?: string): Promi
   if (clientName) {
     doc = { ...doc, affectedClients: clientName }
   }
+
+  // Calculate start/end from timeline
+  const validEntries = doc.timeline.filter((e) => e.dateTime)
+  const sortedEntries = [...validEntries].sort(
+    (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+  )
+  const timelineStart = sortedEntries.length > 0 ? sortedEntries[0].dateTime : (doc.startDate || '')
+  const timelineEnd = sortedEntries.length > 0 ? sortedEntries[sortedEntries.length - 1].dateTime : (doc.endDate || '')
+  const totalDowntime = timelineStart && timelineEnd ? calculateDowntime(timelineStart, timelineEnd) : (doc.totalDowntime || '')
   const logoBuffer = await loadLogoBuffer()
   const children: Paragraph[] = []
 
@@ -127,11 +136,11 @@ export async function exportToDocx(doc: RCADocument, clientName?: string): Promi
   // Description
   addField('Descrição', doc.description)
 
-  // Dates
-  const startFormatted = doc.startDate ? formatDateTime(doc.startDate) : 'N/A'
-  const endFormatted = doc.endDate ? formatDateTime(doc.endDate) : 'N/A'
+  // Dates (from timeline calculation or legacy fields)
+  const startFormatted = timelineStart ? formatDateTime(timelineStart) : 'N/A'
+  const endFormatted = timelineEnd ? formatDateTime(timelineEnd) : 'N/A'
   addField('Data de Início', startFormatted)
-  addField('Data de Solução', `${endFormatted}${doc.totalDowntime ? ` | Tempo Total Indisponibilidade: ${doc.totalDowntime}` : ''}`)
+  addField('Data de Solução', `${endFormatted}${!doc.hideDowntime && totalDowntime ? ` | Tempo Total Indisponibilidade: ${totalDowntime}` : ''}`)
 
   // Impact
   if (doc.clientImpactDescription) {

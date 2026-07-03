@@ -24,11 +24,12 @@ export interface RCADocument {
   // Incident Info
   incidentId: string;
   description: string;
-  startDate: string;
-  endDate: string;
-  totalDowntime: string;
+  startDate?: string;
+  endDate?: string;
+  totalDowntime?: string;
   recurrence: 'yes' | 'no' | '';
   unavailability: 'none' | 'partial' | 'total' | '';
+  hideDowntime: boolean;
 
   // Impact
   affectedClients: string;

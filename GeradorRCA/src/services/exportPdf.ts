@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf'
 import { RCADocument } from '../types/rca'
-import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml } from '../utils/formatters'
+import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml, calculateDowntime } from '../utils/formatters'
 
 const COMPANY_NAME = 'Olos Tecnologia'
 const COMPANY_ADDRESS = 'Torre Milano - Av. Francisco Matarazzo,\n1400 - 13°Andar - Água Branca,\nSão Paulo/SP - CEP 05001-903'
@@ -31,6 +31,15 @@ export async function exportToPdf(doc: RCADocument, clientName?: string): Promis
   if (clientName) {
     doc = { ...doc, affectedClients: clientName }
   }
+
+  // Calculate start/end from timeline
+  const validEntries = doc.timeline.filter((e) => e.dateTime)
+  const sortedEntries = [...validEntries].sort(
+    (a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime()
+  )
+  const timelineStart = sortedEntries.length > 0 ? sortedEntries[0].dateTime : (doc.startDate || '')
+  const timelineEnd = sortedEntries.length > 0 ? sortedEntries[sortedEntries.length - 1].dateTime : (doc.endDate || '')
+  const totalDowntime = timelineStart && timelineEnd ? calculateDowntime(timelineStart, timelineEnd) : (doc.totalDowntime || '')
   const pdf = new jsPDF('p', 'mm', 'a4')
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
@@ -179,15 +188,15 @@ export async function exportToPdf(doc: RCADocument, clientName?: string): Promis
   // Description
   addField('Descrição', doc.description)
 
-  // Dates
-  const startFormatted = doc.startDate ? formatDateTime(doc.startDate) : ''
-  const endFormatted = doc.endDate ? formatDateTime(doc.endDate) : ''
+  // Dates (from timeline calculation or legacy fields)
+  const startFormatted = timelineStart ? formatDateTime(timelineStart) : ''
+  const endFormatted = timelineEnd ? formatDateTime(timelineEnd) : ''
   addField('Data de Início', startFormatted)
 
   // End date + downtime on same conceptual line
   let endLine = endFormatted
-  if (doc.totalDowntime) {
-    endLine += ` | Tempo Total Indisponibilidade: ${doc.totalDowntime}`
+  if (!doc.hideDowntime && totalDowntime) {
+    endLine += ` | Tempo Total Indisponibilidade: ${totalDowntime}`
   }
   addField('Data de Solução', endLine)
 

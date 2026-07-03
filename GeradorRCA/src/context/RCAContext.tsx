@@ -14,11 +14,9 @@ function createEmptyRCA(): RCADocument {
     reviewedBy: '',
     incidentId: '',
     description: '',
-    startDate: '',
-    endDate: '',
-    totalDowntime: '',
     recurrence: '',
     unavailability: '',
+    hideDowntime: false,
     affectedClients: '',
     affectedServices: '',
     clientImpactDescription: '',
@@ -42,7 +40,7 @@ interface RCAStore {
   setActiveSection: (section: RCASection) => void
   setShowPreview: (show: boolean) => void
   setAIPanelOpen: (open: boolean, field?: string | null) => void
-  updateField: (field: keyof RCADocument, value: string) => void
+  updateField: (field: keyof RCADocument, value: string | boolean) => void
   
   // Timeline
   addTimelineEntry: () => void
