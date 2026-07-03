@@ -24,7 +24,11 @@ async function loadLogoBuffer(): Promise<ArrayBuffer | null> {
   }
 }
 
-export async function exportToDocx(doc: RCADocument): Promise<void> {
+export async function exportToDocx(doc: RCADocument, clientName?: string): Promise<void> {
+  // If exporting for a specific client, override affectedClients
+  if (clientName) {
+    doc = { ...doc, affectedClients: clientName }
+  }
   const logoBuffer = await loadLogoBuffer()
   const children: Paragraph[] = []
 
@@ -297,6 +301,7 @@ export async function exportToDocx(doc: RCADocument): Promise<void> {
   })
 
   const blob = await Packer.toBlob(docxDocument)
-  const fileName = `RCA_${doc.incidentId || doc.id}_${doc.createdAt}.docx`
+  const clientSuffix = clientName ? `_${clientName.replace(/[^a-zA-Z0-9À-ú]/g, '_')}` : ''
+  const fileName = `RCA_${doc.incidentId || doc.id}_${doc.createdAt}${clientSuffix}.docx`
   saveAs(blob, fileName)
 }

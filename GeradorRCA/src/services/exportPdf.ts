@@ -26,7 +26,11 @@ async function loadLogoAsBase64(): Promise<string | null> {
   }
 }
 
-export async function exportToPdf(doc: RCADocument): Promise<void> {
+export async function exportToPdf(doc: RCADocument, clientName?: string): Promise<void> {
+  // If exporting for a specific client, override affectedClients
+  if (clientName) {
+    doc = { ...doc, affectedClients: clientName }
+  }
   const pdf = new jsPDF('p', 'mm', 'a4')
   const pageWidth = pdf.internal.pageSize.getWidth()
   const pageHeight = pdf.internal.pageSize.getHeight()
@@ -321,6 +325,7 @@ export async function exportToPdf(doc: RCADocument): Promise<void> {
   }
 
   // Save
-  const fileName = `RCA_${doc.incidentId || doc.id}_${doc.createdAt}.pdf`
+  const clientSuffix = clientName ? `_${clientName.replace(/[^a-zA-Z0-9À-ú]/g, '_')}` : ''
+  const fileName = `RCA_${doc.incidentId || doc.id}_${doc.createdAt}${clientSuffix}.pdf`
   pdf.save(fileName)
 }
