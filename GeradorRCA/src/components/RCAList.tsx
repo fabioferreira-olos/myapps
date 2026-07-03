@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, FileDown, FileText, Calendar, Pencil, Plus, Lock } from 'lucide-react'
+import { ArrowLeft, FileDown, FileText, Calendar, Pencil, Plus, Lock, ChevronDown, ChevronRight, Users } from 'lucide-react'
 import { fetchRCAs, fetchRCA, RCASummary, verifyEditPassword } from '../services/apiService'
 import { exportToPdf } from '../services/exportPdf'
 import { exportToDocx } from '../services/exportDocx'
@@ -12,6 +12,7 @@ export default function RCAList() {
   const [rcas, setRcas] = useState<RCASummary[]>([])
   const [loading, setLoading] = useState(true)
   const [exporting, setExporting] = useState<string | null>(null)
+  const [expandedRca, setExpandedRca] = useState<string | null>(null)
   const [editTarget, setEditTarget] = useState<string | null>(null)
   const [editPwInput, setEditPwInput] = useState('')
   const [editPwError, setEditPwError] = useState('')
@@ -62,27 +63,32 @@ export default function RCAList() {
     })
   }, [rcas, dateFrom, dateTo, clientFilter])
 
-  const handleExportPdf = async (id: string) => {
-    setExporting(id + '-pdf')
-    try {
-      const record = await fetchRCA(id)
-      await exportToPdf(record.data)
-    } catch (err) {
-      console.error('Export PDF error:', err)
-      alert('Erro ao exportar PDF')
-    } finally {
-      setExporting(null)
+  const handleToggleExpand = (rcaId: string) => {
+    if (expandedRca === rcaId) {
+      setExpandedRca(null)
+      return
     }
+    setExpandedRca(rcaId)
   }
 
-  const handleExportDocx = async (id: string) => {
-    setExporting(id + '-docx')
+  const getClientsFromRca = (rca: RCASummary): string[] => {
+    if (!rca.affected_clients) return []
+    return rca.affected_clients.split(', ').filter(Boolean)
+  }
+
+  const handleExportForClient = async (rcaId: string, format: 'pdf' | 'docx', clientName?: string) => {
+    const exportKey = `${rcaId}-${format}-${clientName || 'all'}`
+    setExporting(exportKey)
     try {
-      const record = await fetchRCA(id)
-      await exportToDocx(record.data)
+      const record = await fetchRCA(rcaId)
+      if (format === 'pdf') {
+        await exportToPdf(record.data, clientName)
+      } else {
+        await exportToDocx(record.data, clientName)
+      }
     } catch (err) {
-      console.error('Export DOCX error:', err)
-      alert('Erro ao exportar DOCX')
+      console.error(`Export ${format.toUpperCase()} error:`, err)
+      alert(`Erro ao exportar ${format.toUpperCase()}`)
     } finally {
       setExporting(null)
     }
@@ -211,60 +217,159 @@ export default function RCAList() {
           </div>
         ) : (
           <div className="space-y-3">
-            {filtered.map((rca) => (
-              <div
-                key={rca.id}
-                className="card flex flex-col sm:flex-row sm:items-center justify-between gap-3 !p-4"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-mono text-sm font-semibold text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded">
-                      {rca.id}
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {formatDateTime(rca.created_at)}
-                    </span>
+            {filtered.map((rca) => {
+              const clients = getClientsFromRca(rca)
+              const isExpanded = expandedRca === rca.id
+
+              return (
+                <div key={rca.id} className="card !p-0 overflow-hidden">
+                  {/* RCA header row */}
+                  <div
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                    onClick={() => handleToggleExpand(rca.id)}
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <div className="flex-shrink-0 text-gray-400 dark:text-gray-500">
+                        {isExpanded ? (
+                          <ChevronDown className="w-5 h-5" />
+                        ) : (
+                          <ChevronRight className="w-5 h-5" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-sm font-semibold text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded">
+                            {rca.id}
+                          </span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {formatDateTime(rca.created_at)}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-800 dark:text-gray-200 truncate">
+                          {rca.title || 'Sem título'}
+                        </p>
+                        {rca.incident_id && (
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            Incidente: {rca.incident_id}
+                            {rca.affected_clients && ` • ${rca.affected_clients}`}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        onClick={() => handleEdit(rca.id)}
+                        className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3"
+                        title="Editar RCA"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                        Editar
+                      </button>
+                    </div>
                   </div>
-                  <p className="text-sm text-gray-800 dark:text-gray-200 truncate">
-                    {rca.title || 'Sem título'}
-                  </p>
-                  {rca.incident_id && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Incidente: {rca.incident_id}
-                      {rca.affected_clients && ` • ${rca.affected_clients}`}
-                    </p>
+
+                  {/* Expanded: client export options */}
+                  {isExpanded && (
+                    <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/30 px-4 py-3">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          Exportar por cliente
+                        </span>
+                      </div>
+
+                      {clients.length === 0 ? (
+                        <div className="text-sm text-gray-500 dark:text-gray-400 ml-6 mb-2">
+                          Nenhum cliente registrado nesta RCA.
+                          <div className="flex items-center gap-2 mt-2">
+                            <button
+                              onClick={() => handleExportForClient(rca.id, 'pdf')}
+                              disabled={exporting !== null}
+                              className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3"
+                            >
+                              <FileDown className="w-3.5 h-3.5" />
+                              PDF
+                            </button>
+                            <button
+                              onClick={() => handleExportForClient(rca.id, 'docx')}
+                              disabled={exporting !== null}
+                              className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3"
+                            >
+                              <FileText className="w-3.5 h-3.5" />
+                              DOCX
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="space-y-2 ml-6">
+                          {/* Option: all clients */}
+                          <div className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Todos os clientes
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleExportForClient(rca.id, 'pdf')}
+                                disabled={exporting !== null}
+                                className="btn-secondary flex items-center gap-1.5 text-xs py-1 px-2.5"
+                                title="Exportar PDF com todos os clientes"
+                              >
+                                <FileDown className="w-3.5 h-3.5" />
+                                PDF
+                              </button>
+                              <button
+                                onClick={() => handleExportForClient(rca.id, 'docx')}
+                                disabled={exporting !== null}
+                                className="btn-secondary flex items-center gap-1.5 text-xs py-1 px-2.5"
+                                title="Exportar DOCX com todos os clientes"
+                              >
+                                <FileText className="w-3.5 h-3.5" />
+                                DOCX
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Separator */}
+                          <div className="border-t border-gray-200 dark:border-gray-600" />
+
+                          {/* Individual clients */}
+                          {clients.map((client) => (
+                            <div
+                              key={client}
+                              className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                            >
+                              <span className="text-sm text-gray-700 dark:text-gray-300">
+                                {client}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => handleExportForClient(rca.id, 'pdf', client)}
+                                  disabled={exporting !== null}
+                                  className="btn-secondary flex items-center gap-1.5 text-xs py-1 px-2.5"
+                                  title={`Exportar PDF para ${client}`}
+                                >
+                                  <FileDown className="w-3.5 h-3.5" />
+                                  PDF
+                                </button>
+                                <button
+                                  onClick={() => handleExportForClient(rca.id, 'docx', client)}
+                                  disabled={exporting !== null}
+                                  className="btn-secondary flex items-center gap-1.5 text-xs py-1 px-2.5"
+                                  title={`Exportar DOCX para ${client}`}
+                                >
+                                  <FileText className="w-3.5 h-3.5" />
+                                  DOCX
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => handleEdit(rca.id)}
-                    className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3"
-                    title="Editar RCA"
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                    Editar
-                  </button>
-                  <button
-                    onClick={() => handleExportPdf(rca.id)}
-                    disabled={exporting === rca.id + '-pdf'}
-                    className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3"
-                    title="Exportar PDF"
-                  >
-                    <FileDown className="w-3.5 h-3.5" />
-                    PDF
-                  </button>
-                  <button
-                    onClick={() => handleExportDocx(rca.id)}
-                    disabled={exporting === rca.id + '-docx'}
-                    className="btn-secondary flex items-center gap-1.5 text-xs py-1.5 px-3"
-                    title="Exportar DOCX"
-                  >
-                    <FileText className="w-3.5 h-3.5" />
-                    DOCX
-                  </button>
-                </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
