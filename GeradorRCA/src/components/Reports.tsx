@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, Shield } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface DowntimeData {
   name: string
@@ -27,6 +27,9 @@ export default function Reports() {
   const [dateTo, setDateTo] = useState(() => {
     return new Date().toISOString().split('T')[0]
   })
+  const [downtimePage, setDowntimePage] = useState(0)
+  const [slaPage, setSlaPage] = useState(0)
+  const PAGE_SIZE = 15
 
   useEffect(() => {
     loadReports()
@@ -34,6 +37,8 @@ export default function Reports() {
 
   const loadReports = async () => {
     setLoading(true)
+    setDowntimePage(0)
+    setSlaPage(0)
     try {
       const params = new URLSearchParams()
       if (dateFrom) params.set('from', dateFrom)
@@ -64,6 +69,12 @@ export default function Reports() {
   const sortedDowntime = [...downtimeData].sort((a, b) => b.hours - a.hours)
   const sortedSla = [...slaData].sort((a, b) => a.sla - b.sla)
   const avgSla = slaData.length > 0 ? slaData.reduce((sum, d) => sum + d.sla, 0) / slaData.length : 0
+
+  const downtimeTotalPages = Math.ceil(sortedDowntime.length / PAGE_SIZE)
+  const paginatedDowntime = sortedDowntime.slice(downtimePage * PAGE_SIZE, (downtimePage + 1) * PAGE_SIZE)
+
+  const slaTotalPages = Math.ceil(sortedSla.length / PAGE_SIZE)
+  const paginatedSla = sortedSla.slice(slaPage * PAGE_SIZE, (slaPage + 1) * PAGE_SIZE)
 
   function getSlaStatusBadge(sla: number) {
     if (sla >= 99.9) {
@@ -195,7 +206,8 @@ export default function Reports() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedDowntime.map((item, idx) => {
+                      {paginatedDowntime.map((item, idx) => {
+                        const globalIdx = downtimePage * PAGE_SIZE + idx
                         const percent = totalDowntimeHours > 0 ? (item.hours / totalDowntimeHours) * 100 : 0
                         return (
                           <tr
@@ -203,7 +215,7 @@ export default function Reports() {
                             className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
                           >
                             <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
-                              {idx + 1}
+                              {globalIdx + 1}
                             </td>
                             <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
                               {item.name}
@@ -236,6 +248,34 @@ export default function Reports() {
                       </tr>
                     </tfoot>
                   </table>
+                  {downtimeTotalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        Mostrando {downtimePage * PAGE_SIZE + 1}–{Math.min((downtimePage + 1) * PAGE_SIZE, sortedDowntime.length)} de {sortedDowntime.length}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setDowntimePage((p) => Math.max(0, p - 1))}
+                          disabled={downtimePage === 0}
+                          className="btn-secondary flex items-center gap-1 text-xs py-1.5 px-3 disabled:opacity-40"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                          Anterior
+                        </button>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                          {downtimePage + 1} / {downtimeTotalPages}
+                        </span>
+                        <button
+                          onClick={() => setDowntimePage((p) => Math.min(downtimeTotalPages - 1, p + 1))}
+                          disabled={downtimePage >= downtimeTotalPages - 1}
+                          className="btn-secondary flex items-center gap-1 text-xs py-1.5 px-3 disabled:opacity-40"
+                        >
+                          Próximo
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -273,14 +313,16 @@ export default function Reports() {
                       </tr>
                     </thead>
                     <tbody>
-                      {sortedSla.map((item, idx) => (
-                        <tr
-                          key={item.name}
-                          className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
-                        >
-                          <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
-                            {idx + 1}
-                          </td>
+                      {paginatedSla.map((item, idx) => {
+                        const globalIdx = slaPage * PAGE_SIZE + idx
+                        return (
+                          <tr
+                            key={item.name}
+                            className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                          >
+                            <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
+                              {globalIdx + 1}
+                            </td>
                           <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
                             {item.name}
                           </td>
@@ -302,7 +344,8 @@ export default function Reports() {
                             {getSlaStatusBadge(item.sla)}
                           </td>
                         </tr>
-                      ))}
+                        )
+                      })}
                     </tbody>
                     <tfoot>
                       <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
@@ -329,6 +372,34 @@ export default function Reports() {
                       </tr>
                     </tfoot>
                   </table>
+                  {slaTotalPages > 1 && (
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        Mostrando {slaPage * PAGE_SIZE + 1}–{Math.min((slaPage + 1) * PAGE_SIZE, sortedSla.length)} de {sortedSla.length}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setSlaPage((p) => Math.max(0, p - 1))}
+                          disabled={slaPage === 0}
+                          className="btn-secondary flex items-center gap-1 text-xs py-1.5 px-3 disabled:opacity-40"
+                        >
+                          <ChevronLeft className="w-3.5 h-3.5" />
+                          Anterior
+                        </button>
+                        <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                          {slaPage + 1} / {slaTotalPages}
+                        </span>
+                        <button
+                          onClick={() => setSlaPage((p) => Math.min(slaTotalPages - 1, p + 1))}
+                          disabled={slaPage >= slaTotalPages - 1}
+                          className="btn-secondary flex items-center gap-1 text-xs py-1.5 px-3 disabled:opacity-40"
+                        >
+                          Próximo
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
