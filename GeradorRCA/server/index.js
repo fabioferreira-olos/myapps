@@ -358,11 +358,21 @@ app.get('/api/reports/downtime-by-client', async (req, res) => {
 
     for (const row of result.rows) {
       const data = row.data
-      if (!data.startDate || !data.endDate || !data.affectedClients) continue
+      if (!data.affectedClients) continue
 
-      const start = new Date(data.startDate)
-      const end = new Date(data.endDate)
-      const diffMs = end.getTime() - start.getTime()
+      // Calculate downtime from timeline (preferred) or legacy startDate/endDate
+      let diffMs = 0
+      const timelineEntries = (data.timeline || []).filter(e => e.dateTime)
+      if (timelineEntries.length >= 2) {
+        const sorted = timelineEntries.sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
+        const start = new Date(sorted[0].dateTime)
+        const end = new Date(sorted[sorted.length - 1].dateTime)
+        diffMs = end.getTime() - start.getTime()
+      } else if (data.startDate && data.endDate) {
+        const start = new Date(data.startDate)
+        const end = new Date(data.endDate)
+        diffMs = end.getTime() - start.getTime()
+      }
       if (diffMs <= 0) continue
 
       const hours = parseFloat((diffMs / 3600000).toFixed(2))
@@ -422,11 +432,21 @@ app.get('/api/reports/sla-by-client', async (req, res) => {
 
     for (const row of result.rows) {
       const data = row.data
-      if (!data.startDate || !data.endDate || !data.affectedClients) continue
+      if (!data.affectedClients) continue
 
-      const start = new Date(data.startDate)
-      const end = new Date(data.endDate)
-      const diffMs = end.getTime() - start.getTime()
+      // Calculate downtime from timeline (preferred) or legacy startDate/endDate
+      let diffMs = 0
+      const timelineEntries = (data.timeline || []).filter(e => e.dateTime)
+      if (timelineEntries.length >= 2) {
+        const sorted = timelineEntries.sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
+        const start = new Date(sorted[0].dateTime)
+        const end = new Date(sorted[sorted.length - 1].dateTime)
+        diffMs = end.getTime() - start.getTime()
+      } else if (data.startDate && data.endDate) {
+        const start = new Date(data.startDate)
+        const end = new Date(data.endDate)
+        diffMs = end.getTime() - start.getTime()
+      }
       if (diffMs <= 0) continue
 
       const hours = diffMs / 3600000
