@@ -31,15 +31,24 @@ export default function UserGuide() {
           <h2>Criando uma Nova RCA</h2>
           <p>O formulário é dividido em seções acessíveis pela barra lateral esquerda:</p>
           <ol>
-            <li><strong>Informações Gerais</strong> — Título, ID do incidente, autor e data de criação</li>
-            <li><strong>Incidente</strong> — Descrição, datas de início/término, reincidência e nível de indisponibilidade</li>
+            <li><strong>Informações Gerais</strong> — Título, ID do incidente, autor, revisado por e data de criação</li>
+            <li><strong>Incidente</strong> — Descrição, reincidência e nível de indisponibilidade</li>
             <li><strong>Impacto</strong> — Clientes afetados (seleção com busca), serviços afetados e descrição do impacto</li>
-            <li><strong>Linha do Tempo</strong> — Eventos em ordem cronológica com data/hora</li>
+            <li><strong>Linha do Tempo</strong> — Eventos em ordem cronológica com data/hora. O tempo de indisponibilidade é calculado automaticamente (primeiro evento → último evento)</li>
             <li><strong>Causa Raiz</strong> — Descrição técnica do que causou o incidente e como foi resolvido</li>
             <li><strong>Ações Corretivas</strong> — Ações tomadas para corrigir, com responsável, prazo, status e tipo (Definitiva ou Contorno). Obrigatório pelo menos 1 item.</li>
             <li><strong>Ações Preventivas</strong> — Ações para evitar recorrência (opcional)</li>
             <li><strong>Considerações</strong> — Observações e recomendações finais (opcional — se vazio, não aparece no documento exportado)</li>
           </ol>
+
+          <h2>Tempo de Indisponibilidade</h2>
+          <p>O tempo de indisponibilidade é calculado automaticamente na seção <strong>Linha do Tempo</strong>:</p>
+          <ul>
+            <li>É necessário ter pelo menos <strong>2 eventos</strong> com data/hora preenchida</li>
+            <li>O sistema pega o primeiro e o último evento (ordenados cronologicamente) e calcula a diferença</li>
+            <li>O resultado é exibido em um card azul com Data de Início, Data de Término e Duração</li>
+            <li>Use o checkbox <strong>"Ocultar tempo de indisponibilidade na RCA exportada"</strong> se não quiser que a duração apareça no documento final (as datas de início e término continuarão aparecendo)</li>
+          </ul>
 
           <h2>Campos Obrigatórios</h2>
           <p>Para gravar uma RCA no banco, os seguintes campos devem estar preenchidos:</p>
@@ -47,10 +56,11 @@ export default function UserGuide() {
             <li>Campos de texto com mín. <strong>5 caracteres</strong>: Título, ID Incidente, Criado por, Descrição, Clientes Afetados, Descrição do Impacto, Causa Raiz</li>
             <li>Serviços Afetados: mín. <strong>2 caracteres</strong></li>
             <li>Selects obrigatórios: Reincidência (Sim/Não), Indisponibilidade (Nenhuma/Parcial/Total)</li>
-            <li>Datas obrigatórias: Data de Criação, Data Início, Data Término</li>
+            <li>Data de Criação</li>
+            <li>Linha do Tempo: mín. <strong>2 eventos</strong> (necessário para calcular indisponibilidade)</li>
             <li>Ações Corretivas: mín. <strong>1 item</strong> com Tipo (Definitiva/Contorno) definido</li>
           </ul>
-          <p><strong>Opcionais:</strong> Ações Preventivas e Considerações Finais.</p>
+          <p><strong>Opcionais:</strong> Revisado por, Ações Preventivas e Considerações Finais.</p>
 
           <h2>Botões do Header</h2>
           <table>
@@ -117,14 +127,38 @@ export default function UserGuide() {
             <li>Faça as alterações e clique em <strong>"Atualizar"</strong></li>
           </ol>
 
-          <h2>Exportando PDF / DOCX</h2>
+          <h2>Exportando PDF / DOCX por Cliente</h2>
+          <p>A exportação permite gerar documentos individuais por cliente:</p>
           <ol>
             <li>Clique no botão <strong>"Gerar RCA"</strong> no header</li>
-            <li>Use os filtros de data para encontrar a RCA desejada (padrão: ano atual)</li>
-            <li>Clique em <strong>"PDF"</strong> ou <strong>"DOCX"</strong> para baixar o arquivo</li>
+            <li>Use os filtros de data para encontrar a RCA desejada</li>
+            <li>Clique na <strong>linha da RCA</strong> para expandir e ver os clientes afetados</li>
+            <li>Para cada cliente, há botões <strong>PDF</strong> e <strong>DOCX</strong></li>
+            <li>Ao clicar, o documento gerado mostrará <strong>apenas aquele cliente</strong> no campo "Clientes Afetados"</li>
+            <li>O nome do arquivo incluirá o sufixo do cliente (ex: <code>RCA_INC123_2026-06-10_ClienteX.pdf</code>)</li>
+            <li>Há também a opção <strong>"Todos os clientes"</strong> que gera o documento completo como antes</li>
           </ol>
           <p>Os documentos exportados incluem o cabeçalho da Olos com logo, endereço e informações de contato.</p>
           <p><strong>Nota:</strong> Se o campo Considerações Finais estiver vazio, ele não aparece no documento gerado.</p>
+
+          <h2>Relatórios</h2>
+          <p>Acesse pela navegação do header. Os relatórios apresentam dados consolidados em tabelas:</p>
+
+          <h3>Indisponibilidade por Cliente</h3>
+          <ul>
+            <li>Mostra horas de indisponibilidade acumuladas por cliente no período selecionado</li>
+            <li>Ordenado por horas (maior primeiro)</li>
+            <li>Inclui coluna de % do total com badges coloridos</li>
+            <li>Paginação de 15 em 15 clientes</li>
+          </ul>
+
+          <h3>SLA por Cliente</h3>
+          <ul>
+            <li>Calcula SLA = (horas do período - downtime) / horas do período × 100</li>
+            <li>Ordenado por SLA (pior primeiro)</li>
+            <li>Status semafórico: verde (≥99.9% Saudável), amarelo (≥99% Atenção), vermelho (&lt;99% Crítico)</li>
+            <li>Paginação de 15 em 15 clientes</li>
+          </ul>
 
           <h2>Seleção de Clientes</h2>
           <p>Na seção Impacto, o campo "Clientes Afetados" funciona como um seletor com busca:</p>
@@ -169,9 +203,12 @@ export default function UserGuide() {
           <ul>
             <li>Use <strong>"Limpar/Nova"</strong> para começar do zero a qualquer momento</li>
             <li>Use o <strong>Draft</strong> frequentemente para não perder dados se fechar o navegador</li>
-            <li>O tempo de indisponibilidade é calculado automaticamente a partir das datas</li>
+            <li>O tempo de indisponibilidade é calculado automaticamente a partir dos eventos da linha do tempo</li>
+            <li>Adicione pelo menos 2 eventos na linha do tempo para que o cálculo funcione</li>
+            <li>Na lista de RCAs, clique na RCA para expandir e ver opções de exportação por cliente</li>
             <li>Na lista de RCAs, use <strong>"Nova RCA"</strong> para iniciar uma nova a partir dali</li>
             <li>Ao cadastrar clientes, separe múltiplos nomes por vírgula</li>
+            <li>Nos relatórios, use os botões "Anterior"/"Próximo" para navegar entre páginas de clientes</li>
           </ul>
         </div>
       </div>
