@@ -5,7 +5,7 @@ export default function UserGuide() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8 animate-fade-up">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <button
@@ -15,12 +15,12 @@ export default function UserGuide() {
             <ArrowLeft className="w-4 h-4" />
             Voltar
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-oid-text">
             Guia de Uso
           </h1>
         </div>
 
-        <div className="card prose prose-sm dark:prose-invert max-w-none">
+        <div className="card prose prose-invert prose-sm max-w-none">
           <h2>Visão Geral</h2>
           <p>
             O <strong>Gerador de RCA</strong> é uma ferramenta interna da Olos Tecnologia para criação de documentos de
@@ -98,10 +98,6 @@ export default function UserGuide() {
               <tr>
                 <td><strong>⚙️ (Engrenagem)</strong></td>
                 <td>Acessa a área de administração.</td>
-              </tr>
-              <tr>
-                <td><strong>🌙/☀️</strong></td>
-                <td>Alterna entre modo claro e escuro.</td>
               </tr>
               <tr>
                 <td><strong>? (Interrogação)</strong></td>

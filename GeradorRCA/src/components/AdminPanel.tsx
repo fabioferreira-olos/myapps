@@ -212,14 +212,14 @@ export default function AdminPanel() {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 animate-fade-up">
         <div className="card max-w-sm w-full">
           <div className="text-center mb-6">
-            <Lock className="w-12 h-12 mx-auto mb-3 text-primary-600" />
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+            <Lock className="w-12 h-12 mx-auto mb-3 text-orange" />
+            <h1 className="text-xl font-bold text-oid-text">
               Painel de Administração
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-sm text-oid-muted mt-1">
               Digite a senha para acessar as configurações
             </p>
           </div>
@@ -239,13 +239,13 @@ export default function AdminPanel() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-oid-muted hover:text-oid-sub"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {passwordError && (
-                <p className="text-sm text-red-600 mt-1">{passwordError}</p>
+                <p className="text-sm text-status-red mt-1">{passwordError}</p>
               )}
             </div>
             <button type="submit" className="btn-primary w-full">
@@ -266,7 +266,7 @@ export default function AdminPanel() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8 animate-fade-up">
       <div className="max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <button
@@ -276,14 +276,14 @@ export default function AdminPanel() {
             <ArrowLeft className="w-4 h-4" />
             Voltar
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-oid-text">
             Administração
           </h1>
         </div>
 
         <div className="card space-y-6">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
+          <div className="bg-accent-glow border border-accent/25 rounded-oid-sm p-4">
+            <p className="text-sm text-accent-light">
               Configure as credenciais do AWS Bedrock para habilitar o assistente de IA.
               As credenciais são armazenadas localmente no navegador.
             </p>
@@ -310,7 +310,7 @@ export default function AdminPanel() {
                 className="input-field"
                 placeholder="us.anthropic.claude-sonnet-4-20250514-v1:0"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-oid-muted mt-1">
                 Ex: us.anthropic.claude-sonnet-4-20250514-v1:0, us.anthropic.claude-3-5-haiku-20241022-v1:0
               </p>
             </div>
@@ -324,7 +324,7 @@ export default function AdminPanel() {
                 className="input-field font-mono text-sm"
                 placeholder="Cole aqui sua API Key do Bedrock"
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <p className="text-xs text-oid-muted mt-1">
                 Gerada no console AWS Bedrock → API Keys
               </p>
             </div>
@@ -333,22 +333,22 @@ export default function AdminPanel() {
           {/* Test Result */}
           {testResult && (
             <div
-              className={`flex items-center gap-2 p-3 rounded-lg ${
+              className={`flex items-center gap-2 p-3 rounded-oid-sm animate-fade-in ${
                 testResult.success
-                  ? 'bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800'
-                  : 'bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800'
+                  ? 'bg-status-green-bg border border-status-green-border'
+                  : 'bg-status-red-bg border border-status-red-border'
               }`}
             >
               {testResult.success ? (
-                <Wifi className="w-5 h-5 text-green-600" />
+                <Wifi className="w-5 h-5 text-status-green" />
               ) : (
-                <WifiOff className="w-5 h-5 text-red-600" />
+                <WifiOff className="w-5 h-5 text-status-red" />
               )}
               <span
                 className={`text-sm ${
                   testResult.success
-                    ? 'text-green-800 dark:text-green-200'
-                    : 'text-red-800 dark:text-red-200'
+                    ? 'text-status-green'
+                    : 'text-status-red'
                 }`}
               >
                 {testResult.message}
@@ -357,15 +357,15 @@ export default function AdminPanel() {
           )}
 
           {saved && (
-            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-3">
-              <span className="text-sm text-green-800 dark:text-green-200">
+            <div className="bg-status-green-bg border border-status-green-border rounded-oid-sm p-3 animate-fade-in">
+              <span className="text-sm text-status-green">
                 ✓ Configurações salvas com sucesso!
               </span>
             </div>
           )}
 
           {/* Actions */}
-          <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap gap-3 pt-4 border-t border-oid-border">
             <button onClick={handleSave} className="btn-primary flex items-center gap-2">
               <Save className="w-4 h-4" />
               Salvar Configurações
@@ -386,12 +386,12 @@ export default function AdminPanel() {
         </div>
 
         {/* Client Management */}
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4">
+        <h2 className="text-xl font-bold text-oid-text mt-8 mb-4">
           Cadastro de Clientes
         </h2>
         <div className="card space-y-4">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
+          <div className="bg-accent-glow border border-accent/25 rounded-oid-sm p-4">
+            <p className="text-sm text-accent-light">
               Gerencie os clientes disponíveis para seleção nos documentos RCA.
             </p>
           </div>
@@ -415,26 +415,26 @@ export default function AdminPanel() {
               Adicionar
             </button>
           </div>
-          <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
+          <p className="text-xs text-oid-muted -mt-2">
             Separe múltiplos clientes por vírgula
           </p>
 
           {/* Client list */}
           {clientsLoading ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Carregando...</p>
+            <p className="text-sm text-oid-muted">Carregando...</p>
           ) : clients.length === 0 ? (
-            <p className="text-sm text-gray-500 dark:text-gray-400">Nenhum cliente cadastrado</p>
+            <p className="text-sm text-oid-muted">Nenhum cliente cadastrado</p>
           ) : (
-            <div className="border border-gray-200 dark:border-gray-600 rounded-lg divide-y divide-gray-200 dark:divide-gray-600">
+            <div className="border border-oid-border rounded-oid-sm divide-y divide-oid-border">
               {clients.map((client) => (
                 <div
                   key={client.id}
                   className="flex items-center justify-between px-4 py-2.5"
                 >
-                  <span className="text-sm text-gray-800 dark:text-gray-200">{client.name}</span>
+                  <span className="text-sm text-oid-sub">{client.name}</span>
                   <button
                     onClick={() => handleDeleteClient(client.id)}
-                    className="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                    className="p-1 text-status-red hover:bg-status-red-bg rounded-oid-xxs"
                     title="Remover cliente"
                   >
                     <X className="w-4 h-4" />
@@ -446,12 +446,12 @@ export default function AdminPanel() {
         </div>
 
         {/* RCA Management */}
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4">
+        <h2 className="text-xl font-bold text-oid-text mt-8 mb-4">
           Senha de Edição de RCAs
         </h2>
         <div className="card space-y-4">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <p className="text-sm text-blue-800 dark:text-blue-200">
+          <div className="bg-accent-glow border border-accent/25 rounded-oid-sm p-4">
+            <p className="text-sm text-accent-light">
               Defina a senha necessária para editar RCAs já gravadas. Esta senha é visível aqui e armazenada sem criptografia.
             </p>
           </div>
@@ -473,17 +473,17 @@ export default function AdminPanel() {
             </button>
           </div>
           {editPwSaved && (
-            <p className="text-sm text-green-600 dark:text-green-400">✓ Senha de edição salva!</p>
+            <p className="text-sm text-status-green animate-fade-in">✓ Senha de edição salva!</p>
           )}
         </div>
 
         {/* Deletar RCA */}
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4">
+        <h2 className="text-xl font-bold text-oid-text mt-8 mb-4">
           Deletar RCA
         </h2>
         <div className="card space-y-4">
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+          <div className="bg-status-amber-bg border border-status-amber-border rounded-oid-sm p-4">
+            <p className="text-sm text-status-amber">
               ⚠️ Cuidado: a exclusão de RCAs é permanente e não pode ser desfeita.
             </p>
           </div>
@@ -511,8 +511,8 @@ export default function AdminPanel() {
           </div>
 
           {showDeleteConfirm && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 space-y-3">
-              <p className="text-sm text-red-800 dark:text-red-200 font-medium">
+            <div className="bg-status-red-bg border border-status-red-border rounded-oid-sm p-4 space-y-3 animate-fade-in">
+              <p className="text-sm text-status-red font-medium">
                 Digite TENHO CERTEZA para deletar permanentemente esta RCA.
               </p>
               <div className="flex gap-2">
@@ -542,7 +542,7 @@ export default function AdminPanel() {
         </div>
 
         {/* Password Change */}
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mt-8 mb-4">
+        <h2 className="text-xl font-bold text-oid-text mt-8 mb-4">
           Alterar Senha
         </h2>
         <div className="card space-y-4">
@@ -580,10 +580,10 @@ export default function AdminPanel() {
           </div>
 
           {pwMessage && (
-            <div className={`p-3 rounded-lg text-sm ${
+            <div className={`p-3 rounded-oid-sm text-sm animate-fade-in ${
               pwMessage.type === 'success'
-                ? 'bg-green-50 dark:bg-green-900/20 text-green-800 dark:text-green-200 border border-green-200 dark:border-green-800'
-                : 'bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200 border border-red-200 dark:border-red-800'
+                ? 'bg-status-green-bg text-status-green border border-status-green-border'
+                : 'bg-status-red-bg text-status-red border border-status-red-border'
             }`}>
               {pwMessage.text}
             </div>

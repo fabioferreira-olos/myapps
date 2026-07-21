@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitoramento ONOC — VMware &amp; Switches LAN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-w: 260px;
+            --coal: #1b1f23;
+            --slate: #2d333b;
+            --surface: #f6f8fa;
+            --card: #ffffff;
+            --border: #d1d9e0;
+            --text: #1f2328;
+            --text-muted: #656d76;
+            --accent: #0969da;
+            --accent-subtle: #ddf4ff;
+            --orange: #bc4c00;
+            --orange-subtle: #fff1e5;
+            --red: #cf222e;
+            --red-subtle: #ffebe9;
+            --green: #1a7f37;
+            --green-subtle: #dafbe1;
+            --purple: #8250df;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--surface);
+            color: var(--text);
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        /* ===== LAYOUT ===== */
+        .layout {
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            background: var(--coal);
+            color: #cdd9e5;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px 16px 16px;
+            border-bottom: 1px solid var(--slate);
+        }
+
+        .sidebar-header h1 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+
+        .sidebar-header p {
+            font-size: 11px;
+            color: #768390;
+            margin-top: 4px;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 8px;
+        }
+
+        .nav-group {
+            margin-bottom: 16px;
+        }
+
+        .nav-group-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #768390;
+            padding: 4px 12px 6px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            color: #adbac7;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 400;
+            transition: background 0.15s, color 0.15s;
+        }
+
+        .nav-link:hover {
+            background: var(--slate);
+            color: #fff;
+        }
+
+        .nav-link.active {
+            background: rgba(9, 105, 218, 0.15);
+            color: #58a6ff;
+            font-weight: 500;
+        }
+
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid var(--slate);
+            font-size: 11px;
+            color: #768390;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            margin-left: var(--sidebar-w);
+            padding: 32px 48px 60px;
+            max-width: 1060px;
+            width: 100%;
+        }
+
+        /* ===== SECTIONS ===== */
+        .section {
+            margin-bottom: 48px;
+            scroll-margin-top: 24px;
+        }
+
+        .section-eyebrow {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent);
+            margin-bottom: 6px;
+        }
+
+        .section h2 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 20px;
+            max-width: 640px;
+        }
+
+        h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 28px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin: 20px 0 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        /* ===== CARDS ===== */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .card-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            font-size: 13px;
+            margin: 3px 0;
+        }
+
+        .card strong {
+            font-weight: 600;
+        }
+
+        /* ===== TABLES ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0 20px;
+            font-size: 13px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            table-layout: auto;
+            word-wrap: break-word;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        th {
+            background: var(--surface);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--surface); }
+
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            line-height: 1.5;
+        }
+        .badge-critical { background: var(--red-subtle); color: var(--red); }
+        .badge-high { background: var(--orange-subtle); color: var(--orange); }
+        .badge-medium { background: var(--accent-subtle); color: var(--accent); }
+        .badge-new { background: var(--green-subtle); color: var(--green); }
+        .badge-check { background: var(--orange-subtle); color: var(--orange); }
+
+        /* ===== THRESHOLD TABLE ===== */
+        .th-warn { background: #fff8c5 !important; color: #6a5300; }
+        .th-high { background: var(--orange-subtle) !important; color: var(--orange); }
+        .th-crit { background: var(--red-subtle) !important; color: var(--red); }
+
+        /* ===== CALLOUTS ===== */
+        .callout {
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 12px 0;
+            font-size: 13px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+        .callout-info { background: var(--accent-subtle); border: 1px solid #b6e3ff; }
+        .callout-warn { background: var(--orange-subtle); border: 1px solid #ffd8b5; }
+        .callout-danger { background: var(--red-subtle); border: 1px solid #ffc1ba; }
+
+        /* ===== PROCEDURE BLOCKS ===== */
+        .procedure {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 12px 0;
+        }
+
+        .procedure-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .procedure-tag {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .tag-config { background: var(--accent-subtle); color: var(--accent); }
+        .tag-runbook { background: var(--orange-subtle); color: var(--orange); }
+
+        .procedure ol, .procedure ul {
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .procedure li {
+            margin: 5px 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* ===== CODE BLOCKS ===== */
+        .code-block {
+            background: var(--coal);
+            color: #adbac7;
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.7;
+            overflow-x: auto;
+            margin: 10px 0;
+            white-space: pre;
+        }
+        .code-block .cm { color: #768390; }
+        .code-block .k { color: #6cb6ff; }
+        .code-block .v { color: #96d0ff; }
+        .code-block .s { color: #a5d6ff; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                overflow-x: auto;
+            }
+            .sidebar-nav { display: flex; gap: 4px; padding: 8px; flex-wrap: nowrap; }
+            .nav-group { margin: 0; display: flex; gap: 4px; }
+            .nav-group-label { display: none; }
+            .nav-link { white-space: nowrap; }
+            .main { margin-left: 0; padding: 20px 16px; max-width: 100%; }
+            .sidebar-header, .sidebar-footer { display: none; }
+        }
+
+        @media print {
+            .sidebar { display: none; }
+            .main { margin-left: 0; max-width: 100%; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
+        }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ===== SIDEBAR ===== -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h1>ONOC Runbook</h1>
+        <p>VMware &amp; Switches LAN</p>
+    </div>
+    <nav class="sidebar-nav">
+        <div class="nav-group">
+            <div class="nav-group-label">VMware / ESXi</div>
+            <a href="#vmware-overview" class="nav-link">Visao Geral</a>
+            <a href="#vmware-config" class="nav-link">Configuracao Zabbix</a>
+            <a href="#vmware-checklist" class="nav-link">Checklist</a>
+            <a href="#vmware-thresholds" class="nav-link">Thresholds</a>
+            <a href="#vmware-runbooks" class="nav-link">Runbooks</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Switches / LAN</div>
+            <a href="#switches-overview" class="nav-link">Visao Geral</a>
+            <a href="#switches-config" class="nav-link">Configuracao Zabbix</a>
+            <a href="#switches-checklist" class="nav-link">Checklist</a>
+            <a href="#switches-latencia" class="nav-link">Latencia LAN</a>
+            <a href="#switches-thresholds" class="nav-link">Thresholds</a>
+            <a href="#switches-runbooks" class="nav-link">Runbooks</a>
+        </div>
+        <div class="nav-group">
+            <div class="nav-group-label">Operacao</div>
+            <a href="#gap-analysis" class="nav-link">Gap Analysis</a>
+            <a href="#verificacao" class="nav-link">Checklists Periodicos</a>
+            <a href="#escalacao" class="nav-link">Escalacao</a>
+        </div>
+    </nav>
+    <div class="sidebar-footer">
+        v2.0 — Julho 2026<br>Colocation Ascenty
+    </div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main class="main">
+
+<!-- ============================================================ -->
+<!-- VMWARE: VISAO GERAL                                          -->
+<!-- ============================================================ -->
+<div id="vmware-overview" class="section">
+    <div class="section-eyebrow">VMware / ESXi</div>
+    <h2>Visao Geral dos Clusters</h2>
+    <p class="section-desc">Os hosts ESXi rodam o hypervisor VMware — um SO proprietario onde nao se instala Zabbix Agent. O monitoramento e feito via vCenter API, que expoe metricas de hosts, VMs e clusters.</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-label">Inventario</div>
+            <p><strong>Clusters:</strong> 2</p>
+            <p><strong>Cluster OC02:</strong> Rack OC-02</p>
+            <p><strong>Cluster OC08:</strong> Rack OC-08</p>
+            <p><strong>Hosts ESXi:</strong> <em>[definir qtde]</em></p>
+        </div>
+        <div class="card">
+            <div class="card-label">Como Monitorar</div>
+            <p><strong>Metodo:</strong> vCenter SOAP API</p>
+            <p><strong>Template:</strong> "VMware by HTTP"</p>
+            <p><strong>Agente:</strong> Nenhum no ESXi</p>
+            <p><strong>Requisito:</strong> Conta read-only no vCenter</p>
+        </div>
+    </div>
+
+    <div class="callout callout-warn">
+        <span class="callout-icon">&#9888;</span>
+        <div><strong>Licao aprendida:</strong> Um coldstop ocorreu por falta de monitoramento de CPU/MEM nos hosts ESXi. Sem visibilidade, o cluster saturou ate nao conseguir manter as VMs. A implementacao deste monitoramento e prioridade maxima.</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VMWARE: CONFIGURACAO ZABBIX                                   -->
+<!-- ============================================================ -->
+<div id="vmware-config" class="section">
+    <div class="section-eyebrow">VMware / ESXi</div>
+    <h2>Configuracao no Zabbix</h2>
+    <p class="section-desc">O Zabbix conecta ao vCenter usando VMware collectors internos. Nao usa interface SNMP ou Agent — a coleta passa inteiramente pela API SOAP do vCenter.</p>
+
+    <h3>Pre-requisitos no vCenter</h3>
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-config">Config</span> Conta de servico no vCenter</div>
+        <ol>
+            <li>Criar usuario dedicado: <code>zabbix-monitor@vsphere.local</code></li>
+            <li>Atribuir role <strong>Read-only</strong> em Global Permissions</li>
+            <li>Marcar "Propagate to children" = Sim</li>
+            <li>Validar acesso: login no vSphere Client com a conta deve mostrar tudo em read-only</li>
+        </ol>
+    </div>
+
+    <h3>Configuracao do Zabbix Server</h3>
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-config">Config</span> Parametros em zabbix_server.conf</div>
+        <ol>
+            <li>Editar <code>/etc/zabbix/zabbix_server.conf</code></li>
+            <li>Ajustar parametros:</li>
+        </ol>
+    </div>
+
+    <div class="code-block"><span class="cm"># Collectors - minimo 2 (um por vCenter se houver mais de um)</span>
+<span class="k">StartVMwareCollectors</span>=<span class="v">2</span>
+
+<span class="cm"># Intervalo de coleta (segundos)</span>
+<span class="k">VMwareFrequency</span>=<span class="v">60</span>
+
+<span class="cm"># Coleta de performance counters</span>
+<span class="k">VMwarePerfFrequency</span>=<span class="v">60</span>
+
+<span class="cm"># Cache - aumentar se muitos objetos</span>
+<span class="k">VMwareCacheSize</span>=<span class="v">32M</span>
+
+<span class="cm"># Timeout de conexao</span>
+<span class="k">VMwareTimeout</span>=<span class="v">30</span></div>
+
+    <div class="callout callout-info">
+        <span class="callout-icon">&#8505;</span>
+        <div>Apos alterar o conf, reiniciar o servico: <code>systemctl restart zabbix-server</code></div>
+    </div>
+
+    <h3>Criar Host no Zabbix Frontend</h3>
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-config">Config</span> Registrar vCenter como host</div>
+        <ol>
+            <li>Configuration → Hosts → Create host</li>
+            <li><strong>Host name:</strong> vCenter-Olos</li>
+            <li><strong>Groups:</strong> VMware / Hypervisors</li>
+            <li><strong>Interfaces:</strong> Nenhuma (coleta via VMware collectors)</li>
+            <li><strong>Templates:</strong> Linkar "VMware by HTTP"</li>
+            <li><strong>Macros:</strong> Configurar conforme abaixo</li>
+        </ol>
+    </div>
+
+    <div class="code-block"><span class="cm"># Macros no host do vCenter (Zabbix Frontend → Host → Macros)</span>
+<span class="k">{$VMWARE.URL}</span>      = <span class="s">https://vcenter.dominio.local/sdk</span>
+<span class="k">{$VMWARE.USERNAME}</span>  = <span class="s">zabbix-monitor@vsphere.local</span>
+<span class="k">{$VMWARE.PASSWORD}</span>  = <span class="s">[senha_da_conta]</span></div>
+
+    <div class="callout callout-info">
+        <span class="callout-icon">&#8505;</span>
+        <div><strong>Discovery automatico:</strong> Apos configurar, o template descobre automaticamente todos os Hosts ESXi e VMs. Eles aparecem como hosts individuais no Zabbix com items e triggers proprios.</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- VMWARE: CHECKLIST                                             -->
+<!-- ============================================================ -->
+<div id="vmware-checklist" class="section">
+    <div class="section-eyebrow">VMware / ESXi</div>
+    <h2>Checklist de Monitoramento</h2>
+    <p class="section-desc">Metricas coletadas via vCenter API. Todos os itens abaixo devem estar ativos no Zabbix apos a integracao com o vCenter.</p>
+
+    <h4>Por Host ESXi</h4>
+    <table>
+        <thead>
+            <tr><th>Item</th><th>Metrica VMware</th><th>Descricao</th><th>Prioridade</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>CPU Utilization (%)</td><td>cpu.usage.average</td><td>Uso total de CPU do host</td><td><span class="badge badge-critical">Critica</span></td></tr>
+            <tr><td>Memory Utilization (%)</td><td>mem.usage.average</td><td>RAM fisica em uso</td><td><span class="badge badge-critical">Critica</span></td></tr>
+            <tr><td>Memory Ballooning</td><td>mem.vmmemctl.average</td><td>RAM recuperada via balloon (pressao de memoria)</td><td><span class="badge badge-high">Alta</span></td></tr>
+            <tr><td>Connection State</td><td>runtime.connectionState</td><td>connected / disconnected / notResponding</td><td><span class="badge badge-critical">Critica</span></td></tr>
+            <tr><td>Power State</td><td>runtime.powerState</td><td>poweredOn / poweredOff / standBy</td><td><span class="badge badge-critical">Critica</span></td></tr>
+            <tr><td>Uptime / Boot Time</td><td>runtime.bootTime</td><td>Detecta reboots inesperados</td><td><span class="badge badge-high">Alta</span></td></tr>
+            <tr><td>NIC Status (per vmnic)</td><td>net.status</td><td>Status fisico das NICs</td><td><span class="badge badge-high">Alta</span></td></tr>
+            <tr><td>NIC Traffic (per vmnic)</td><td>net.bytesRx / net.bytesTx</td><td>Trafego por adaptador</td><td><span class="badge badge-medium">Media</span></td></tr>
+            <tr><td>Hardware Sensors</td><td>runtime.healthSystemRuntime</td><td>Temperatura, fan, PSU via CIM</td><td><span class="badge badge-medium">Media</span></td></tr>
+        </tbody>
+    </table>
+
+    <h4>Por Cluster</h4>
+    <table>
+        <thead>
+            <tr><th>Item</th><th>Metrica</th><th>Descricao</th><th>Prioridade</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Overall Status</td><td>overallStatus</td><td>green / yellow / red / gray</td><td><span class="badge badge-critical">Critica</span></td></tr>
+            <tr><td>HA Enabled</td><td>configuration.dasConfig.enabled</td><td>vSphere HA ativo e funcional?</td><td><span class="badge badge-critical">Critica</span></td></tr>
+            <tr><td>DRS Enabled</td><td>configuration.drsConfig.enabled</td><td>DRS ativo para balanceamento?</td><td><span class="badge badge-high">Alta</span></td></tr>
+            <tr><td>CPU Total vs Used</td><td>Aggregated</td><td>Capacity planning de compute</td><td><span class="badge badge-high">Alta</span></td></tr>
+            <tr><td>Memory Total vs Used</td><td>Aggregated</td><td>Capacity planning de RAM</td><td><span class="badge badge-high">Alta</span></td></tr>
+        </tbody>
+    </table>
+
+    <h4>Por VM (recomendado para VMs criticas)</h4>
+    <table>
+        <thead>
+            <tr><th>Item</th><th>Metrica</th><th>Descricao</th><th>Prioridade</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Power State</td><td>runtime.powerState</td><td>poweredOn / Off / suspended</td><td><span class="badge badge-high">Alta</span></td></tr>
+            <tr><td>CPU Ready (%)</td><td>cpu.ready.summation</td><td>Tempo esperando por CPU (contencao)</td><td><span class="badge badge-high">Alta</span></td></tr>
+            <tr><td>Snapshot Age</td><td>snapshot.currentSnapshot</td><td>Snapshots antigos degradam performance</td><td><span class="badge badge-medium">Media</span></td></tr>
+            <tr><td>Guest Heartbeat</td><td>guestHeartbeatStatus</td><td>VMware Tools respondendo?</td><td><span class="badge badge-medium">Media</span></td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- VMWARE: THRESHOLDS                                            -->
+<!-- ============================================================ -->
+<div id="vmware-thresholds" class="section">
+    <div class="section-eyebrow">VMware / ESXi</div>
+    <h2>Thresholds Recomendados</h2>
+    <p class="section-desc">Valores para triggers no Zabbix. Ajustar conforme baseline real do ambiente apos 2 semanas de coleta.</p>
+
+    <table>
+        <thead>
+            <tr><th>Metrica</th><th class="th-warn">Warning</th><th class="th-high">High</th><th class="th-crit">Critical</th><th>Duracao</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Host CPU</td><td>70%</td><td>85%</td><td>95%</td><td>10 min</td></tr>
+            <tr><td>Host Memory</td><td>80%</td><td>90%</td><td>95%</td><td>10 min</td></tr>
+            <tr><td>Memory Ballooning</td><td>&gt; 0 MB</td><td>&gt; 100 MB</td><td>&gt; 500 MB</td><td>5 min</td></tr>
+            <tr><td>Host Disconnected</td><td>—</td><td>—</td><td>state != connected</td><td>Imediato</td></tr>
+            <tr><td>Host Rebooted</td><td>—</td><td>uptime &lt; 1h</td><td>—</td><td>Imediato</td></tr>
+            <tr><td>Cluster Status</td><td>yellow</td><td>—</td><td>red</td><td>Imediato</td></tr>
+            <tr><td>VM CPU Ready</td><td>5%</td><td>10%</td><td>20%</td><td>10 min</td></tr>
+            <tr><td>Snapshot Age</td><td>&gt; 3 dias</td><td>&gt; 7 dias</td><td>&gt; 14 dias</td><td>—</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- VMWARE: RUNBOOKS                                              -->
+<!-- ============================================================ -->
+<div id="vmware-runbooks" class="section">
+    <div class="section-eyebrow">VMware / ESXi</div>
+    <h2>Runbooks</h2>
+    <p class="section-desc">Procedimentos para os cenarios de incidente mais comuns nos clusters VMware.</p>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-runbook">Runbook</span> Host ESXi com Alta CPU/Memory (Risco de Coldstop)</div>
+        <ol>
+            <li><strong>Identificar:</strong> Qual host? Qual cluster (OC02 ou OC08)?</li>
+            <li><strong>Verificar cluster:</strong> Todos os hosts acima de 85%? Se sim → risco CRITICO de coldstop</li>
+            <li><strong>Top VMs:</strong> vCenter → Performance → identificar VMs com maior consumo</li>
+            <li><strong>DRS:</strong> Ativo? Ha recomendacoes de vMotion pendentes?</li>
+            <li><strong>Acao 1:</strong> Se DRS ativo → aprovar vMotions para balancear carga</li>
+            <li><strong>Acao 2:</strong> Se cluster saturado → identificar VMs nao-criticas para desligar</li>
+            <li><strong>Acao 3:</strong> Desligar VMs de dev/test/staging se existirem</li>
+            <li><strong>Escalar:</strong> Risco iminente → Lider de Infra imediatamente</li>
+            <li><strong>Prevenir:</strong> Abrir request para adicao de hosts ou migracao de workloads</li>
+        </ol>
+    </div>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-runbook">Runbook</span> Host ESXi Disconnected / Not Responding</div>
+        <ol>
+            <li><strong>Ping:</strong> Host responde ICMP na management network?</li>
+            <li><strong>Se nao responde:</strong> Possivel crash ou perda de rede</li>
+            <li><strong>iDRAC:</strong> Acessar iDRAC via IP de management — servidor esta ligado?</li>
+            <li><strong>VMs:</strong> Se HA ativo → VMs devem reiniciar em outros hosts automaticamente</li>
+            <li><strong>Se HA nao atuou:</strong> Verificar configuracao de HA e isolation response</li>
+            <li><strong>Acesso fisico:</strong> Se necessario → chamado Ascenty para acesso ao rack</li>
+            <li><strong>Pos-recuperacao:</strong> Confirmar que host entrou no cluster e VMs estao saudaveis</li>
+            <li><strong>RCA:</strong> Logs do host (/var/log/vmkernel.log) + iDRAC lifecycle log</li>
+        </ol>
+    </div>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-runbook">Runbook</span> Reboot Inesperado de Host ESXi</div>
+        <ol>
+            <li><strong>Detectado via:</strong> Trigger de uptime &lt; 1h (bootTime resetou)</li>
+            <li><strong>Verificar VMs:</strong> Quais VMs estavam neste host? Foram reiniciadas pelo HA?</li>
+            <li><strong>iDRAC lifecycle:</strong> Evento de hardware (PSU, temperatura, DIMM)?</li>
+            <li><strong>vmkernel.log:</strong> Buscar por PSOD (Purple Screen of Death) ou panic</li>
+            <li><strong>Se PSOD:</strong> Coletar coredump e abrir SR com VMware/Broadcom</li>
+            <li><strong>Se hardware:</strong> Abrir chamado Dell ProSupport com Service Tag</li>
+            <li><strong>Documentar:</strong> Registrar timeline e causa raiz para historico</li>
+        </ol>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SWITCHES: VISAO GERAL                                         -->
+<!-- ============================================================ -->
+<div id="switches-overview" class="section">
+    <div class="section-eyebrow">Switches / LAN</div>
+    <h2>Visao Geral</h2>
+    <p class="section-desc">Os switches fornecem a interconexao entre servidores e firewalls dentro de cada rack e entre racks. Um problema em switch afeta multiplos servidores simultaneamente.</p>
+
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-label">Funcao</div>
+            <p>Interconexao intra-rack e inter-rack</p>
+            <p>Uplinks entre racks</p>
+            <p>Rede de management e producao</p>
+        </div>
+        <div class="card">
+            <div class="card-label">Monitoramento</div>
+            <p><strong>Protocolo:</strong> SNMP (v2c ou v3)</p>
+            <p><strong>Template:</strong> "Network interfaces by SNMP" ou vendor-specific</p>
+            <p><strong>LLD:</strong> Discovery automatico de portas</p>
+        </div>
+        <div class="card">
+            <div class="card-label">Criticidade</div>
+            <p>Mudanca de speed ja causou incidente nao detectado</p>
+            <p>Latencia LAN elevada impactou comunicacao</p>
+            <p><strong>Status anterior:</strong> Nao monitorado</p>
+        </div>
+    </div>
+
+    <div class="callout callout-danger">
+        <span class="callout-icon">&#9888;</span>
+        <div><strong>Gap critico:</strong> Switches nao estavam no monitoramento. Mudanca de speed e latencia LAN foram detectados somente no momento do impacto ao servico. Todo o monitoramento desta secao e novo.</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SWITCHES: CONFIGURACAO                                         -->
+<!-- ============================================================ -->
+<div id="switches-config" class="section">
+    <div class="section-eyebrow">Switches / LAN</div>
+    <h2>Configuracao no Zabbix</h2>
+    <p class="section-desc">Adicionar cada switch gerenciavel ao Zabbix via SNMP para coletar metricas de portas, trafego e erros.</p>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-config">Config</span> Adicionar Switch ao Zabbix</div>
+        <ol>
+            <li><strong>Inventariar:</strong> Listar switches gerenciaveis (marca, modelo, IP management, rack)</li>
+            <li><strong>Habilitar SNMP:</strong> No switch, configurar community (v2c) ou usuario SNMPv3</li>
+            <li><strong>Zabbix Frontend:</strong> Configuration → Hosts → Create host
+                <ul>
+                    <li>Host name: <code>SW-OC01-01</code> (exemplo)</li>
+                    <li>Groups: Switches / Network</li>
+                    <li>Interface: SNMP, IP do switch, porta 161</li>
+                </ul>
+            </li>
+            <li><strong>Template:</strong> Linkar conforme vendor:
+                <ul>
+                    <li>Generico: "Interfaces by SNMP"</li>
+                    <li>Cisco: "Cisco IOS by SNMP"</li>
+                    <li>Dell: "Dell Force10 by SNMP"</li>
+                    <li>HP/Aruba: "HP Enterprise Switch by SNMP"</li>
+                </ul>
+            </li>
+            <li><strong>Macro:</strong> <code>{$SNMP_COMMUNITY}</code> = community string configurada</li>
+            <li><strong>Validar:</strong> Executar LLD discovery e confirmar que portas ativas aparecem</li>
+        </ol>
+    </div>
+
+    <div class="callout callout-info">
+        <span class="callout-icon">&#8505;</span>
+        <div>O template generico "Interfaces by SNMP" funciona em qualquer switch que suporte ifTable/ifXTable (praticamente todos os gerenciaveis). Use templates vendor-specific apenas se precisar de metricas extras como CPU/MEM do switch.</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SWITCHES: CHECKLIST                                            -->
+<!-- ============================================================ -->
+<div id="switches-checklist" class="section">
+    <div class="section-eyebrow">Switches / LAN</div>
+    <h2>Checklist de Monitoramento</h2>
+    <p class="section-desc">Metricas coletadas via SNMP em cada switch. O LLD descobre portas automaticamente.</p>
+
+    <table>
+        <thead>
+            <tr><th>Item</th><th>OID</th><th>Descricao</th><th>Prioridade</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Port Oper Status</td>
+                <td><code>ifOperStatus</code><br>.1.3.6.1.2.1.2.2.1.8</td>
+                <td>UP(1) / DOWN(2) por porta</td>
+                <td><span class="badge badge-critical">Critica</span></td>
+            </tr>
+            <tr>
+                <td>Port Admin Status</td>
+                <td><code>ifAdminStatus</code><br>.1.3.6.1.2.1.2.2.1.7</td>
+                <td>Admin=UP + Oper=DOWN = problema fisico</td>
+                <td><span class="badge badge-high">Alta</span></td>
+            </tr>
+            <tr>
+                <td>Port Speed</td>
+                <td><code>ifHighSpeed</code><br>.1.3.6.1.2.1.31.1.1.1.15</td>
+                <td>Detecta auto-negociacao incorreta</td>
+                <td><span class="badge badge-high">Alta</span></td>
+            </tr>
+            <tr>
+                <td>Traffic IN (bps)</td>
+                <td><code>ifHCInOctets</code><br>.1.3.6.1.2.1.31.1.1.1.6</td>
+                <td>Trafego de entrada por porta</td>
+                <td><span class="badge badge-medium">Media</span></td>
+            </tr>
+            <tr>
+                <td>Traffic OUT (bps)</td>
+                <td><code>ifHCOutOctets</code><br>.1.3.6.1.2.1.31.1.1.1.10</td>
+                <td>Trafego de saida por porta</td>
+                <td><span class="badge badge-medium">Media</span></td>
+            </tr>
+            <tr>
+                <td>Input Errors (rate)</td>
+                <td><code>ifInErrors</code><br>.1.3.6.1.2.1.2.2.1.14</td>
+                <td>Erros de entrada (CRC, frame)</td>
+                <td><span class="badge badge-high">Alta</span></td>
+            </tr>
+            <tr>
+                <td>Output Errors (rate)</td>
+                <td><code>ifOutErrors</code><br>.1.3.6.1.2.1.2.2.1.20</td>
+                <td>Erros de saida</td>
+                <td><span class="badge badge-high">Alta</span></td>
+            </tr>
+            <tr>
+                <td>Input Discards</td>
+                <td><code>ifInDiscards</code><br>.1.3.6.1.2.1.2.2.1.13</td>
+                <td>Pacotes descartados (buffer overflow)</td>
+                <td><span class="badge badge-medium">Media</span></td>
+            </tr>
+            <tr>
+                <td>Output Discards</td>
+                <td><code>ifOutDiscards</code><br>.1.3.6.1.2.1.2.2.1.19</td>
+                <td>Pacotes descartados na saida</td>
+                <td><span class="badge badge-medium">Media</span></td>
+            </tr>
+            <tr>
+                <td>Port Utilization (%)</td>
+                <td>Calculado</td>
+                <td>(traffic bps / ifSpeed) * 100</td>
+                <td><span class="badge badge-high">Alta</span></td>
+            </tr>
+            <tr>
+                <td>Switch CPU</td>
+                <td>Vendor-specific</td>
+                <td>Carga de processamento do switch</td>
+                <td><span class="badge badge-medium">Media</span></td>
+            </tr>
+            <tr>
+                <td>Switch Uptime</td>
+                <td><code>sysUpTime</code><br>.1.3.6.1.2.1.1.3</td>
+                <td>Detecta reboots</td>
+                <td><span class="badge badge-medium">Media</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Trigger de Port Speed Mismatch</h3>
+    <div class="code-block"><span class="cm"># Detectar negociacao abaixo do esperado (via LLD)</span>
+<span class="cm"># ifHighSpeed retorna em Mbps: 1000 = 1Gbps, 10000 = 10Gbps</span>
+
+<span class="k">Name:</span> <span class="s">Port {#IFNAME} ({#IFALIAS}) speed is {ITEM.LASTVALUE} Mbps - below expected</span>
+<span class="k">Expression:</span> <span class="v">last(/switch/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) < 1000</span>
+<span class="k">Severity:</span> <span class="s">High</span>
+
+<span class="cm"># Para portas 10G (uplinks):</span>
+<span class="k">Expression:</span> <span class="v">last(/switch/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) < 10000</span>
+  <span class="cm">and "{#IFALIAS}" matches "uplink"</span></div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SWITCHES: LATENCIA LAN                                        -->
+<!-- ============================================================ -->
+<div id="switches-latencia" class="section">
+    <div class="section-eyebrow">Switches / LAN</div>
+    <h2>Monitoramento de Latencia LAN</h2>
+    <p class="section-desc">Em uma LAN saudavel, latencia entre equipamentos deve ser inferior a 1ms. Valores acima de 2ms indicam problema. Usar probes ICMP entre pontos estrategicos.</p>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-config">Config</span> Implementar Probes de Latencia Intra-site</div>
+        <ol>
+            <li><strong>Definir pontos de medicao:</strong> IPs representativos em cada rack
+                <ul>
+                    <li>Firewall management IP de cada rack</li>
+                    <li>Switch management IP (ou 1 servidor por rack)</li>
+                    <li>vCenter / ESXi management IPs</li>
+                </ul>
+            </li>
+            <li><strong>Criar items no Zabbix</strong> (no host do Zabbix Server/Proxy ou em um servidor com agent):
+                <ul>
+                    <li><code>icmppingsec[ip_destino,,,,]</code> → RTT em segundos</li>
+                    <li><code>icmppingloss[ip_destino,,,,]</code> → packet loss %</li>
+                    <li>Intervalo: 30 segundos</li>
+                </ul>
+            </li>
+            <li><strong>Pares criticos minimos:</strong>
+                <ul>
+                    <li>Firewall OC-02 ↔ ESXi hosts OC-02</li>
+                    <li>Firewall OC-08 ↔ ESXi hosts OC-08</li>
+                    <li>Inter-rack: OC-02 ↔ OC-08</li>
+                    <li>Rack telecom ↔ Rack dados (ex: OC-01 ↔ OC-02)</li>
+                </ul>
+            </li>
+            <li><strong>Triggers:</strong> RTT > 2ms warning, > 5ms high, > 10ms critical</li>
+        </ol>
+    </div>
+
+    <div class="callout callout-info">
+        <span class="callout-icon">&#8505;</span>
+        <div><strong>Baseline:</strong> Nos primeiros 7 dias, apenas coletar dados sem triggers para estabelecer o valor normal. Ajustar thresholds baseado na realidade do ambiente.</div>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- SWITCHES: THRESHOLDS                                          -->
+<!-- ============================================================ -->
+<div id="switches-thresholds" class="section">
+    <div class="section-eyebrow">Switches / LAN</div>
+    <h2>Thresholds Recomendados</h2>
+    <p class="section-desc">Valores para triggers. Ajustar apos periodo de baseline.</p>
+
+    <table>
+        <thead>
+            <tr><th>Metrica</th><th class="th-warn">Warning</th><th class="th-high">High</th><th class="th-crit">Critical</th><th>Duracao</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Port Down (admin UP, oper DOWN)</td><td>—</td><td>—</td><td>ifOperStatus = 2</td><td>Imediato</td></tr>
+            <tr><td>Port Speed &lt; Expected</td><td>—</td><td>ifHighSpeed &lt; baseline</td><td>—</td><td>Imediato</td></tr>
+            <tr><td>Port Utilization</td><td>70%</td><td>85%</td><td>95%</td><td>5 min</td></tr>
+            <tr><td>Input Errors (rate/min)</td><td>10/min</td><td>50/min</td><td>100/min</td><td>5 min</td></tr>
+            <tr><td>Output Errors (rate/min)</td><td>10/min</td><td>50/min</td><td>100/min</td><td>5 min</td></tr>
+            <tr><td>LAN Latency (RTT)</td><td>2 ms</td><td>5 ms</td><td>10 ms</td><td>3 min</td></tr>
+            <tr><td>LAN Packet Loss</td><td>0.5%</td><td>1%</td><td>3%</td><td>3 min</td></tr>
+            <tr><td>Switch CPU</td><td>60%</td><td>80%</td><td>95%</td><td>5 min</td></tr>
+            <tr><td>Switch Rebooted</td><td>—</td><td>uptime &lt; 1h</td><td>—</td><td>Imediato</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- SWITCHES: RUNBOOKS                                             -->
+<!-- ============================================================ -->
+<div id="switches-runbooks" class="section">
+    <div class="section-eyebrow">Switches / LAN</div>
+    <h2>Runbooks</h2>
+    <p class="section-desc">Procedimentos para cenarios de incidente na rede LAN.</p>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-runbook">Runbook</span> Porta DOWN com Servidor Conectado</div>
+        <ol>
+            <li><strong>Identificar:</strong> Qual switch? Qual porta? Qual servidor esta conectado?</li>
+            <li><strong>Redundancia:</strong> Servidor responde por outra interface? (NIC teaming/bonding)</li>
+            <li><strong>Fisico:</strong> Cabo conectado? LED da porta aceso?</li>
+            <li><strong>Admin status:</strong> Porta foi desabilitada? (ifAdminStatus = 2 = shutdown)</li>
+            <li><strong>Se admin UP + oper DOWN:</strong> Problema fisico (cabo, SFP, porta defeituosa)</li>
+            <li><strong>Teste 1:</strong> Mover cabo para outra porta do switch</li>
+            <li><strong>Teste 2:</strong> Testar com cabo reserva</li>
+            <li><strong>Se porta defeituosa:</strong> Migrar permanentemente, documentar porta danificada</li>
+            <li><strong>Acesso fisico:</strong> Se necessario → chamado Ascenty</li>
+        </ol>
+    </div>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-runbook">Runbook</span> Latencia LAN Elevada (&gt;5ms)</div>
+        <ol>
+            <li><strong>Escopo:</strong> Latencia em um caminho especifico ou generalizada?</li>
+            <li><strong>Se generalizada:</strong> Possivel saturacao de uplink ou broadcast storm</li>
+            <li><strong>Port utilization:</strong> Alguma porta de uplink/trunk acima de 85%?</li>
+            <li><strong>Erros:</strong> Portas com alto rate de errors/discards no caminho?</li>
+            <li><strong>Spanning-tree:</strong> Mudanca de topologia STP recente? (logs do switch)</li>
+            <li><strong>ARP/MAC table:</strong> Entries excessivas indicam loop ou ataque</li>
+            <li><strong>Se porta com erros:</strong> Verificar cabo/SFP naquele segmento</li>
+            <li><strong>Se saturacao:</strong> Redistribuir carga ou avaliar upgrade de uplinks</li>
+            <li><strong>Documentar:</strong> Registrar baseline normal para comparacao</li>
+        </ol>
+    </div>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-runbook">Runbook</span> Erros Excessivos em Porta (&gt;50/min)</div>
+        <ol>
+            <li><strong>Tipo:</strong> CRC? Frame errors? Alignment?</li>
+            <li><strong>CRC errors:</strong> Geralmente = cabo danificado, SFP com problema, interferencia</li>
+            <li><strong>Discards:</strong> Buffer overflow (porta congestionada) ou policy drop</li>
+            <li><strong>Duplex:</strong> Mismatch entre switch e dispositivo?</li>
+            <li><strong>Speed:</strong> Mismatch pode gerar late collisions</li>
+            <li><strong>Acao - cabo:</strong> Substituir patch cord, testar com cable tester</li>
+            <li><strong>Acao - SFP:</strong> Verificar potencia optica (DOM), limpar conectores</li>
+            <li><strong>Se persiste:</strong> Trocar porta no switch, documentar defeito</li>
+        </ol>
+    </div>
+
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-runbook">Runbook</span> Port Speed Abaixo do Esperado</div>
+        <ol>
+            <li><strong>Identificar:</strong> Qual porta? Speed atual vs esperado? (ex: 100M ao inves de 1G)</li>
+            <li><strong>Verificar outro lado:</strong> O servidor tambem mostra speed reduzido?</li>
+            <li><strong>Auto-negotiate:</strong> Ativo em ambos os lados? (recomendado para copper)</li>
+            <li><strong>Cabo:</strong> Cat5e/Cat6 para 1G? Cabo pode estar degradado</li>
+            <li><strong>Teste:</strong> Reconectar cabo em ambos os lados</li>
+            <li><strong>Teste:</strong> Substituir cabo por um reserva sabidamente bom</li>
+            <li><strong>Se problema persiste:</strong> Fixar speed manualmente em ambos os lados (switch + NIC)</li>
+            <li><strong>Documentar:</strong> Registrar qual porta/servidor tinha o problema e resolucao</li>
+        </ol>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- GAP ANALYSIS                                                   -->
+<!-- ============================================================ -->
+<div id="gap-analysis" class="section">
+    <div class="section-eyebrow">Operacao</div>
+    <h2>Gap Analysis</h2>
+    <p class="section-desc">Problemas recentes mapeados contra lacunas de monitoramento, com plano de acao.</p>
+
+    <table class="gap-table">
+        <thead>
+            <tr><th>Problema</th><th>Lacuna</th><th>Acao</th><th>Prioridade</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Coldstop do cluster VMware</strong></td>
+                <td>Sem monitoramento de CPU/MEM dos hosts ESXi</td>
+                <td>Integrar Zabbix com vCenter API. Triggers em 70/85/95%.</td>
+                <td><span class="badge badge-critical">P1</span></td>
+            </tr>
+            <tr>
+                <td><strong>Restart de hosts ESXi nao detectado</strong></td>
+                <td>Sem monitoramento de uptime/bootTime</td>
+                <td>Monitorar runtime.bootTime. Trigger: uptime &lt; 1h.</td>
+                <td><span class="badge badge-high">P2</span></td>
+            </tr>
+            <tr>
+                <td><strong>Mudanca de speed das portas</strong></td>
+                <td>Switches nao monitorados, sem coleta de ifSpeed</td>
+                <td>SNMP nos switches + trigger ifHighSpeed &lt; baseline.</td>
+                <td><span class="badge badge-high">P2</span></td>
+            </tr>
+            <tr>
+                <td><strong>Latencia na rede LAN</strong></td>
+                <td>Sem ICMP intra-site, sem monitoramento de port errors</td>
+                <td>Probes ICMP entre pontos criticos + ifInErrors/ifOutErrors.</td>
+                <td><span class="badge badge-high">P2</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Roadmap</h3>
+    <table>
+        <thead>
+            <tr><th>Fase</th><th>Prazo</th><th>Entregas</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge badge-critical">P1</span></td>
+                <td>Semana 1–2</td>
+                <td>vCenter integrado ao Zabbix, hosts ESXi monitorados (CPU, MEM, connection state), triggers ativos</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-high">P2</span></td>
+                <td>Semana 3–4</td>
+                <td>Switches adicionados via SNMP, LLD de portas, port speed monitoring, probes ICMP de latencia LAN</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-medium">P3</span></td>
+                <td>Semana 5–6</td>
+                <td>Ajuste de thresholds apos baseline, dashboards de capacity planning, documentacao de baseline</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- ============================================================ -->
+<!-- CHECKLISTS PERIODICOS                                          -->
+<!-- ============================================================ -->
+<div id="verificacao" class="section">
+    <div class="section-eyebrow">Operacao</div>
+    <h2>Checklists Periodicos</h2>
+    <p class="section-desc">Verificacoes de rotina para o time ONOC referentes a VMware e Switches.</p>
+
+    <h3>Diario — Inicio de turno</h3>
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-config">Checklist</span> Verificacao Diaria</div>
+        <ol>
+            <li>Zabbix: alertas ativos de VMware ou Switches nao tratados?</li>
+            <li>Todos os hosts ESXi com connectionState = connected?</li>
+            <li>Algum host ESXi com CPU ou MEM acima de 70%? (tendencia)</li>
+            <li>Probes de latencia LAN: algum acima de 2ms nas ultimas 24h?</li>
+            <li>Portas de switch com erros crescentes?</li>
+            <li>Algum alerta de port speed mismatch?</li>
+        </ol>
+    </div>
+
+    <h3>Semanal</h3>
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-config">Checklist</span> Verificacao Semanal</div>
+        <ol>
+            <li>Clusters VMware: capacity planning — CPU/MEM total vs utilizado (projecao)</li>
+            <li>Snapshots de VMs: algum com mais de 3 dias?</li>
+            <li>Port errors acumulados nos switches: tendencia crescente em alguma porta?</li>
+            <li>Reboots de hosts ESXi na semana: algum nao planejado?</li>
+            <li>Verificar se todos os switches e hosts novos estao no monitoramento</li>
+        </ol>
+    </div>
+
+    <h3>Mensal</h3>
+    <div class="procedure">
+        <div class="procedure-title"><span class="procedure-tag tag-config">Checklist</span> Revisao Mensal</div>
+        <ol>
+            <li>Revisar incidentes do mes: novo gap identificado?</li>
+            <li>Thresholds geraram falso-positivos? Ajustar se necessario</li>
+            <li>Capacity planning formal: projecao 3-6 meses para compute</li>
+            <li>Validar que LLD descobriu todos os objetos (novos hosts, VMs, portas)</li>
+            <li>Atualizar este documento com novos aprendizados</li>
+        </ol>
+    </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ESCALACAO                                                      -->
+<!-- ============================================================ -->
+<div id="escalacao" class="section">
+    <div class="section-eyebrow">Operacao</div>
+    <h2>Escalacao</h2>
+    <p class="section-desc">Quem acionar e quando, para incidentes relacionados a VMware e Switches LAN.</p>
+
+    <h3>Severidades</h3>
+    <table>
+        <thead>
+            <tr><th>Nivel</th><th>Descricao</th><th>Exemplos</th><th>Resposta</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge badge-critical">SEV 1</span></td>
+                <td>Multiplos clientes impactados / indisponibilidade</td>
+                <td>Coldstop de cluster, multiplas portas down</td>
+                <td>Imediato (15 min)</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-high">SEV 2</span></td>
+                <td>Degradacao ou risco iminente</td>
+                <td>Host ESXi >95%, host disconnected, porta de uplink down</td>
+                <td>30 min</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-medium">SEV 3</span></td>
+                <td>Anomalia sem impacto imediato</td>
+                <td>Port speed reduzido, latencia LAN elevada</td>
+                <td>2 horas</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Fluxo</h3>
+    <table>
+        <thead>
+            <tr><th>Tempo</th><th>SEV 1</th><th>SEV 2</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>0 min</td><td>ONOC inicia + notifica Lider Infra</td><td>ONOC inicia troubleshooting</td></tr>
+            <tr><td>15 min</td><td>Lider engajado + Gerencia notificada</td><td>ONOC segue runbook</td></tr>
+            <tr><td>30 min</td><td>War room + acionar fornecedores</td><td>Escalar para Lider se sem resolucao</td></tr>
+            <tr><td>60 min</td><td>Diretoria + plano de contingencia</td><td>Lider engajado + fornecedores se necessario</td></tr>
+        </tbody>
+    </table>
+
+    <h3>Contatos</h3>
+    <table>
+        <thead>
+            <tr><th>Equipe</th><th>Responsabilidade</th><th>Contato</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><strong>ONOC (N1)</strong></td><td>Monitoramento 24x7, execucao de runbooks</td><td><em>[Preencher]</em></td></tr>
+            <tr><td><strong>Infra N2</strong></td><td>Troubleshooting avancado, configuracao</td><td><em>[Preencher]</em></td></tr>
+            <tr><td><strong>Lider Infra</strong></td><td>Decisoes tecnicas, escalacao fornecedores</td><td><em>[Preencher]</em></td></tr>
+            <tr><td><strong>Ascenty</strong></td><td>Acesso fisico ao rack, infraestrutura do DC</td><td><em>[Preencher]</em></td></tr>
+            <tr><td><strong>Dell ProSupport</strong></td><td>Hardware: servidores ESXi</td><td><em>[Preencher]</em></td></tr>
+            <tr><td><strong>VMware/Broadcom</strong></td><td>vSphere, vCenter, ESXi (PSOD, bugs)</td><td><em>[Preencher]</em></td></tr>
+        </tbody>
+    </table>
+
+    <h3>Dados para Escalacao a Fornecedores</h3>
+    <div class="card-grid">
+        <div class="card">
+            <div class="card-label">Dell ProSupport</div>
+            <p><strong>Service Tag</strong> do servidor</p>
+            <p>Modelo (PowerEdge Rxxxx)</p>
+            <p>Componente com falha</p>
+            <p>iDRAC lifecycle log export</p>
+            <p>Obs: acesso via Ascenty</p>
+        </div>
+        <div class="card">
+            <div class="card-label">VMware / Broadcom</div>
+            <p>vCenter version</p>
+            <p>ESXi build number</p>
+            <p>Sintoma (PSOD, crash, etc)</p>
+            <p>Coredump / vmkernel.log</p>
+            <p>Support bundle (vm-support)</p>
+        </div>
+    </div>
+</div>
+
+</main>
+</div>
+
+<!-- Sidebar active link highlight -->
+<script>
+(function() {
+    var links = document.querySelectorAll('.nav-link');
+    var sections = [];
+    links.forEach(function(link) {
+        var id = link.getAttribute('href').replace('#', '');
+        var el = document.getElementById(id);
+        if (el) sections.push({ el: el, link: link });
+    });
+
+    function updateActive() {
+        var scrollTop = window.scrollY + 80;
+        var active = sections[0];
+        for (var i = 0; i < sections.length; i++) {
+            if (sections[i].el.offsetTop <= scrollTop) {
+                active = sections[i];
+            }
+        }
+        links.forEach(function(l) { l.classList.remove('active'); });
+        if (active) active.link.classList.add('active');
+    }
+
+    window.addEventListener('scroll', updateActive);
+    updateActive();
+})();
+</script>
+</body>
+</html>

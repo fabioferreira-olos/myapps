@@ -79,20 +79,20 @@ export default function Reports() {
   function getSlaStatusBadge(sla: number) {
     if (sla >= 99.9) {
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-status-green-bg border border-status-green-border text-status-green">
           Saudável
         </span>
       )
     }
     if (sla >= 99) {
       return (
-        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-status-amber-bg border border-status-amber-border text-status-amber">
           Atenção
         </span>
       )
     }
     return (
-      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200">
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-status-red-bg border border-status-red-border text-status-red">
         Crítico
       </span>
     )
@@ -100,16 +100,16 @@ export default function Reports() {
 
   function getPercentBadge(percent: number) {
     if (percent >= 30) {
-      return 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+      return 'bg-status-red-bg border border-status-red-border text-status-red'
     }
     if (percent >= 15) {
-      return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
+      return 'bg-status-amber-bg border border-status-amber-border text-status-amber'
     }
-    return 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
+    return 'bg-oid-surface-soft border border-oid-border text-oid-sub'
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8 animate-fade-up">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
@@ -120,7 +120,7 @@ export default function Reports() {
             <ArrowLeft className="w-4 h-4" />
             Voltar
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-oid-text">
             Relatórios
           </h1>
         </div>
@@ -131,7 +131,7 @@ export default function Reports() {
             <div>
               <label className="label">Período de</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-oid-muted" />
                 <input
                   type="date"
                   value={dateFrom}
@@ -143,7 +143,7 @@ export default function Reports() {
             <div>
               <label className="label">Período até</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-oid-muted" />
                 <input
                   type="date"
                   value={dateTo}
@@ -157,52 +157,52 @@ export default function Reports() {
               <button
                 onClick={loadReports}
                 disabled={loading}
-                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-5 rounded-lg transition-colors duration-200 disabled:opacity-50"
+                className="btn-primary"
               >
                 {loading ? 'Carregando...' : 'SELECIONAR'}
               </button>
             </div>
             {totalPeriodHours > 0 && (
-              <div className="text-sm text-gray-500 dark:text-gray-400 pb-2">
-                Período total: <strong>{totalPeriodHours.toFixed(0)}h</strong>
+              <div className="text-sm text-oid-muted pb-2">
+                Período total: <strong className="text-oid-text font-mono">{totalPeriodHours.toFixed(0)}h</strong>
               </div>
             )}
           </div>
         </div>
 
         {loading ? (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-12 text-oid-muted">
             Carregando relatórios...
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Report 1: Downtime by Client - Table */}
+            {/* Report 1: Downtime by Client */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-primary-600" />
+                <h2 className="text-lg font-semibold text-oid-text flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-orange" />
                   Indisponibilidade por Cliente
                 </h2>
                 {downtimeData.length > 0 && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    Total: <strong className="text-gray-900 dark:text-white">{totalDowntimeHours.toFixed(2)}h</strong>
+                  <span className="text-sm text-oid-muted">
+                    Total: <strong className="text-oid-text font-mono">{totalDowntimeHours.toFixed(2)}h</strong>
                   </span>
                 )}
               </div>
 
               {downtimeData.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+                <div className="text-center py-8 text-oid-muted border-2 border-dashed border-oid-border rounded-oid-md">
                   <p>Nenhum dado de indisponibilidade encontrado para o período selecionado</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">#</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Cliente</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Indisponibilidade</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">% do Total</th>
+                      <tr className="border-b border-oid-border">
+                        <th className="text-left py-3 px-4 font-semibold text-oid-sub">#</th>
+                        <th className="text-left py-3 px-4 font-semibold text-oid-sub">Cliente</th>
+                        <th className="text-right py-3 px-4 font-semibold text-oid-sub">Indisponibilidade</th>
+                        <th className="text-right py-3 px-4 font-semibold text-oid-sub">% do Total</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -212,15 +212,15 @@ export default function Reports() {
                         return (
                           <tr
                             key={item.name}
-                            className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                            className="border-b border-oid-border-soft hover:bg-oid-surface-soft transition-colors"
                           >
-                            <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
+                            <td className="py-3 px-4 text-oid-muted font-mono text-xs">
                               {globalIdx + 1}
                             </td>
-                            <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
+                            <td className="py-3 px-4 text-oid-text font-medium">
                               {item.name}
                             </td>
-                            <td className="py-3 px-4 text-right font-mono text-gray-900 dark:text-white">
+                            <td className="py-3 px-4 text-right font-mono text-oid-text">
                               {item.hours.toFixed(2)}h
                             </td>
                             <td className="py-3 px-4 text-right">
@@ -233,15 +233,15 @@ export default function Reports() {
                       })}
                     </tbody>
                     <tfoot>
-                      <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
+                      <tr className="border-t-2 border-oid-border bg-[rgba(255,255,255,0.04)]">
                         <td className="py-3 px-4" colSpan={2}>
-                          <span className="font-semibold text-gray-900 dark:text-white">Total</span>
+                          <span className="font-semibold text-oid-text">Total</span>
                         </td>
-                        <td className="py-3 px-4 text-right font-mono font-bold text-gray-900 dark:text-white">
+                        <td className="py-3 px-4 text-right font-mono font-bold text-orange">
                           {totalDowntimeHours.toFixed(2)}h
                         </td>
                         <td className="py-3 px-4 text-right">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-oid-surface border border-oid-border text-oid-sub">
                             100%
                           </span>
                         </td>
@@ -249,8 +249,8 @@ export default function Reports() {
                     </tfoot>
                   </table>
                   {downtimeTotalPages > 1 && (
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-oid-border-soft">
+                      <span className="text-sm text-oid-muted">
                         Mostrando {downtimePage * PAGE_SIZE + 1}–{Math.min((downtimePage + 1) * PAGE_SIZE, sortedDowntime.length)} de {sortedDowntime.length}
                       </span>
                       <div className="flex items-center gap-2">
@@ -262,7 +262,7 @@ export default function Reports() {
                           <ChevronLeft className="w-3.5 h-3.5" />
                           Anterior
                         </button>
-                        <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                        <span className="text-sm text-oid-sub font-medium font-mono">
                           {downtimePage + 1} / {downtimeTotalPages}
                         </span>
                         <button
@@ -280,16 +280,16 @@ export default function Reports() {
               )}
             </div>
 
-            {/* Report 2: SLA by Client - Table */}
+            {/* Report 2: SLA by Client */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-primary-600" />
+                <h2 className="text-lg font-semibold text-oid-text flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-accent-light" />
                   SLA por Cliente
                 </h2>
                 {slaData.length > 0 && (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
-                    SLA médio: <strong className={`${avgSla >= 99.9 ? 'text-green-600 dark:text-green-400' : avgSla >= 99 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-600 dark:text-red-400'}`}>
+                  <span className="text-sm text-oid-muted">
+                    SLA médio: <strong className={`font-mono ${avgSla >= 99.9 ? 'text-status-green' : avgSla >= 99 ? 'text-status-amber' : 'text-status-red'}`}>
                       {avgSla.toFixed(2)}%
                     </strong>
                   </span>
@@ -297,19 +297,19 @@ export default function Reports() {
               </div>
 
               {slaData.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+                <div className="text-center py-8 text-oid-muted border-2 border-dashed border-oid-border rounded-oid-md">
                   <p>Nenhum dado de SLA encontrado para o período selecionado</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-gray-200 dark:border-gray-700">
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">#</th>
-                        <th className="text-left py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Cliente</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Downtime</th>
-                        <th className="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">SLA</th>
-                        <th className="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">Status</th>
+                      <tr className="border-b border-oid-border">
+                        <th className="text-left py-3 px-4 font-semibold text-oid-sub">#</th>
+                        <th className="text-left py-3 px-4 font-semibold text-oid-sub">Cliente</th>
+                        <th className="text-right py-3 px-4 font-semibold text-oid-sub">Downtime</th>
+                        <th className="text-right py-3 px-4 font-semibold text-oid-sub">SLA</th>
+                        <th className="text-center py-3 px-4 font-semibold text-oid-sub">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -318,50 +318,50 @@ export default function Reports() {
                         return (
                           <tr
                             key={item.name}
-                            className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                            className="border-b border-oid-border-soft hover:bg-oid-surface-soft transition-colors"
                           >
-                            <td className="py-3 px-4 text-gray-500 dark:text-gray-400 font-mono text-xs">
+                            <td className="py-3 px-4 text-oid-muted font-mono text-xs">
                               {globalIdx + 1}
                             </td>
-                          <td className="py-3 px-4 text-gray-900 dark:text-white font-medium">
-                            {item.name}
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono text-gray-700 dark:text-gray-300">
-                            {item.downtime}h
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                              item.sla >= 99.9
-                                ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
-                                : item.sla >= 99
-                                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
-                                  : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
-                            }`}>
-                              {item.sla.toFixed(2)}%
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-center">
-                            {getSlaStatusBadge(item.sla)}
-                          </td>
-                        </tr>
+                            <td className="py-3 px-4 text-oid-text font-medium">
+                              {item.name}
+                            </td>
+                            <td className="py-3 px-4 text-right font-mono text-oid-sub">
+                              {item.downtime}h
+                            </td>
+                            <td className="py-3 px-4 text-right">
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                                item.sla >= 99.9
+                                  ? 'bg-status-green-bg border border-status-green-border text-status-green'
+                                  : item.sla >= 99
+                                    ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
+                                    : 'bg-status-red-bg border border-status-red-border text-status-red'
+                              }`}>
+                                {item.sla.toFixed(2)}%
+                              </span>
+                            </td>
+                            <td className="py-3 px-4 text-center">
+                              {getSlaStatusBadge(item.sla)}
+                            </td>
+                          </tr>
                         )
                       })}
                     </tbody>
                     <tfoot>
-                      <tr className="border-t-2 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800/50">
+                      <tr className="border-t-2 border-oid-border bg-[rgba(255,255,255,0.04)]">
                         <td className="py-3 px-4" colSpan={2}>
-                          <span className="font-semibold text-gray-900 dark:text-white">Média Geral</span>
+                          <span className="font-semibold text-oid-text">Média Geral</span>
                         </td>
-                        <td className="py-3 px-4 text-right font-mono text-gray-700 dark:text-gray-300">
+                        <td className="py-3 px-4 text-right font-mono text-oid-sub">
                           {(slaData.reduce((sum, d) => sum + d.downtime, 0)).toFixed(2)}h
                         </td>
                         <td className="py-3 px-4 text-right">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
                             avgSla >= 99.9
-                              ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
+                              ? 'bg-status-green-bg border border-status-green-border text-status-green'
                               : avgSla >= 99
-                                ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200'
-                                : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+                                ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
+                                : 'bg-status-red-bg border border-status-red-border text-status-red'
                           }`}>
                             {avgSla.toFixed(2)}%
                           </span>
@@ -373,8 +373,8 @@ export default function Reports() {
                     </tfoot>
                   </table>
                   {slaTotalPages > 1 && (
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-oid-border-soft">
+                      <span className="text-sm text-oid-muted">
                         Mostrando {slaPage * PAGE_SIZE + 1}–{Math.min((slaPage + 1) * PAGE_SIZE, sortedSla.length)} de {sortedSla.length}
                       </span>
                       <div className="flex items-center gap-2">
@@ -386,7 +386,7 @@ export default function Reports() {
                           <ChevronLeft className="w-3.5 h-3.5" />
                           Anterior
                         </button>
-                        <span className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                        <span className="text-sm text-oid-sub font-medium font-mono">
                           {slaPage + 1} / {slaTotalPages}
                         </span>
                         <button

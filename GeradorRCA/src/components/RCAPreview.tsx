@@ -17,17 +17,17 @@ export default function RCAPreview() {
   }, [doc.timeline])
 
   return (
-    <div className="h-full overflow-y-auto bg-white dark:bg-gray-800 p-8">
+    <div className="h-full overflow-y-auto bg-oid-surface backdrop-blur-glass p-8">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
-        <div className="text-center border-b border-gray-200 dark:border-gray-700 pb-6">
-          <h1 className="text-3xl font-bold text-primary-700 dark:text-primary-400">
+        <div className="text-center border-b border-oid-border pb-6">
+          <h1 className="text-3xl font-bold text-orange">
             Análise de Causa Raiz (RCA)
           </h1>
-          <h2 className="text-xl text-gray-600 dark:text-gray-400 mt-2">
+          <h2 className="text-xl text-oid-sub mt-2">
             {doc.title || 'Documento sem título'}
           </h2>
-          <div className="flex items-center justify-center gap-4 mt-4 text-sm text-gray-500 dark:text-gray-400">
+          <div className="flex items-center justify-center gap-4 mt-4 text-sm text-oid-muted">
             {doc.incidentId && <span>ID: {doc.incidentId}</span>}
             {doc.createdAt && <span>Data: {doc.createdAt}</span>}
           </div>
@@ -63,11 +63,11 @@ export default function RCAPreview() {
           </div>
           {doc.clientImpactDescription && (
             <div className="mt-3">
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+              <span className="text-xs font-medium text-oid-muted uppercase">
                 Descrição do Impacto
               </span>
               <div
-                className="prose dark:prose-invert max-w-none text-sm mt-1"
+                className="prose prose-invert max-w-none text-sm mt-1"
                 dangerouslySetInnerHTML={{ __html: doc.clientImpactDescription }}
               />
             </div>
@@ -85,16 +85,16 @@ export default function RCAPreview() {
                 })
                 .map((entry, index) => (
                   <div key={entry.id} className="flex gap-4">
-                    <div className="flex-shrink-0 w-6 h-6 bg-primary-100 dark:bg-primary-900 rounded-full flex items-center justify-center mt-0.5">
-                      <span className="text-xs font-bold text-primary-700 dark:text-primary-300">
+                    <div className="flex-shrink-0 w-6 h-6 bg-orange/10 rounded-full flex items-center justify-center mt-0.5">
+                      <span className="text-xs font-bold text-orange">
                         {index + 1}
                       </span>
                     </div>
                     <div>
-                      <div className="text-xs font-medium text-primary-600 dark:text-primary-400">
+                      <div className="text-xs font-medium text-orange">
                         {formatDateTime(entry.dateTime) || entry.dateTime}
                       </div>
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
+                      <div className="text-sm text-oid-sub">
                         {entry.event}
                       </div>
                     </div>
@@ -108,7 +108,7 @@ export default function RCAPreview() {
         {doc.rootCause && (
           <Section title="Causa Raiz">
             <div
-              className="prose dark:prose-invert max-w-none text-sm"
+              className="prose prose-invert max-w-none text-sm"
               dangerouslySetInnerHTML={{ __html: doc.rootCause }}
             />
           </Section>
@@ -132,7 +132,7 @@ export default function RCAPreview() {
         {doc.considerations && (
           <Section title="Considerações Finais">
             <div
-              className="prose dark:prose-invert max-w-none text-sm"
+              className="prose prose-invert max-w-none text-sm"
               dangerouslySetInnerHTML={{ __html: doc.considerations }}
             />
           </Section>
@@ -144,8 +144,8 @@ export default function RCAPreview() {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-5">
-      <h3 className="text-lg font-semibold text-primary-700 dark:text-primary-400 mb-3 pb-2 border-b border-gray-100 dark:border-gray-700">
+    <div className="border border-oid-border rounded-oid-sm p-5">
+      <h3 className="text-lg font-semibold text-orange mb-3 pb-2 border-b border-oid-border-soft">
         {title}
       </h3>
       {children}
@@ -156,11 +156,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Field({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+      <span className="text-xs font-medium text-oid-muted uppercase">
         {label}
       </span>
-      <p className="text-sm text-gray-800 dark:text-gray-200 mt-0.5">
-        {value || <span className="text-gray-400 italic">Não preenchido</span>}
+      <p className="text-sm text-oid-sub mt-0.5">
+        {value || <span className="text-oid-muted italic">Não preenchido</span>}
       </p>
     </div>
   )
@@ -171,19 +171,19 @@ function ActionsPreviewTable({ actions }: { actions: { id: string; description: 
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="border-b border-gray-200 dark:border-gray-600">
-            <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-400">Ação</th>
-            <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-400">Responsável</th>
-            <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-400">Prazo</th>
-            <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-400">Status</th>
+          <tr className="border-b border-oid-border">
+            <th className="text-left py-2 px-3 font-medium text-oid-sub">Ação</th>
+            <th className="text-left py-2 px-3 font-medium text-oid-sub">Responsável</th>
+            <th className="text-left py-2 px-3 font-medium text-oid-sub">Prazo</th>
+            <th className="text-left py-2 px-3 font-medium text-oid-sub">Status</th>
           </tr>
         </thead>
         <tbody>
           {actions.map((action: any) => (
-            <tr key={action.id} className="border-b border-gray-100 dark:border-gray-700">
-              <td className="py-2 px-3 text-gray-800 dark:text-gray-200">{action.description || '-'}</td>
-              <td className="py-2 px-3 text-gray-600 dark:text-gray-400">{action.responsible || '-'}</td>
-              <td className="py-2 px-3 text-gray-600 dark:text-gray-400">{action.deadline || '-'}</td>
+            <tr key={action.id} className="border-b border-oid-border-soft">
+              <td className="py-2 px-3 text-oid-sub">{action.description || '-'}</td>
+              <td className="py-2 px-3 text-oid-muted">{action.responsible || '-'}</td>
+              <td className="py-2 px-3 text-oid-muted">{action.deadline || '-'}</td>
               <td className="py-2 px-3">
                 <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(action.status)}`}>
                   {getStatusLabel(action.status)}

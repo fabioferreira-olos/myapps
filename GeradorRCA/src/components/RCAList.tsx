@@ -131,7 +131,7 @@ export default function RCAList() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8 animate-fade-up">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-3 mb-6">
           <button
@@ -141,7 +141,7 @@ export default function RCAList() {
             <ArrowLeft className="w-4 h-4" />
             Voltar
           </button>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-2xl font-bold text-oid-text">
             RCAs Gravadas
           </h1>
           <button
@@ -162,7 +162,7 @@ export default function RCAList() {
             <div>
               <label className="label">Data de</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-oid-muted" />
                 <input
                   type="date"
                   value={dateFrom}
@@ -174,7 +174,7 @@ export default function RCAList() {
             <div>
               <label className="label">Data até</label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-oid-muted" />
                 <input
                   type="date"
                   value={dateTo}
@@ -199,7 +199,7 @@ export default function RCAList() {
                 ))}
               </datalist>
             </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400 pb-2">
+            <div className="text-sm text-oid-muted pb-2">
               {filtered.length} RCA{filtered.length !== 1 ? 's' : ''} encontrada{filtered.length !== 1 ? 's' : ''}
             </div>
           </div>
@@ -207,11 +207,11 @@ export default function RCAList() {
 
         {/* RCA List */}
         {loading ? (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+          <div className="text-center py-12 text-oid-muted">
             Carregando RCAs...
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+          <div className="text-center py-12 text-oid-muted border-2 border-dashed border-oid-border rounded-oid-md">
             <p className="text-lg">Não há RCAs para o cliente e período selecionado</p>
             <p className="text-sm mt-1">Ajuste os filtros ou grave uma nova RCA</p>
           </div>
@@ -225,11 +225,11 @@ export default function RCAList() {
                 <div key={rca.id} className="card !p-0 overflow-hidden">
                   {/* RCA header row */}
                   <div
-                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 cursor-pointer hover:bg-oid-surface-hover/50 transition-colors"
                     onClick={() => handleToggleExpand(rca.id)}
                   >
                     <div className="flex items-center gap-3 flex-1 min-w-0">
-                      <div className="flex-shrink-0 text-gray-400 dark:text-gray-500">
+                      <div className="flex-shrink-0 text-oid-muted">
                         {isExpanded ? (
                           <ChevronDown className="w-5 h-5" />
                         ) : (
@@ -238,18 +238,18 @@ export default function RCAList() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-mono text-sm font-semibold text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 px-2 py-0.5 rounded">
+                          <span className="font-mono text-sm font-semibold text-orange bg-orange/10 px-2 py-0.5 rounded-oid-xxs">
                             {rca.id}
                           </span>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                          <span className="text-xs text-oid-muted font-mono">
                             {formatDateTime(rca.created_at)}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-800 dark:text-gray-200 truncate">
+                        <p className="text-sm text-oid-text truncate">
                           {rca.title || 'Sem título'}
                         </p>
                         {rca.incident_id && (
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                          <p className="text-xs text-oid-muted">
                             Incidente: {rca.incident_id}
                             {rca.affected_clients && ` • ${rca.affected_clients}`}
                           </p>
@@ -270,16 +270,16 @@ export default function RCAList() {
 
                   {/* Expanded: client export options */}
                   {isExpanded && (
-                    <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/30 px-4 py-3">
+                    <div className="border-t border-oid-border bg-[rgba(255,255,255,0.04)] px-4 py-3 animate-fade-in">
                       <div className="flex items-center gap-2 mb-3">
-                        <Users className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <Users className="w-4 h-4 text-oid-muted" />
+                        <span className="text-sm font-medium text-oid-sub">
                           Exportar por cliente
                         </span>
                       </div>
 
                       {clients.length === 0 ? (
-                        <div className="text-sm text-gray-500 dark:text-gray-400 ml-6 mb-2">
+                        <div className="text-sm text-oid-muted ml-6 mb-2">
                           Nenhum cliente registrado nesta RCA.
                           <div className="flex items-center gap-2 mt-2">
                             <button
@@ -303,8 +303,8 @@ export default function RCAList() {
                       ) : (
                         <div className="space-y-2 ml-6">
                           {/* Option: all clients */}
-                          <div className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          <div className="flex items-center justify-between py-1.5 px-3 rounded-oid-xxs hover:bg-oid-surface-hover/50 transition-colors">
+                            <span className="text-sm font-medium text-oid-text">
                               Todos os clientes
                             </span>
                             <div className="flex items-center gap-2">
@@ -330,15 +330,15 @@ export default function RCAList() {
                           </div>
 
                           {/* Separator */}
-                          <div className="border-t border-gray-200 dark:border-gray-600" />
+                          <div className="border-t border-oid-border-soft" />
 
                           {/* Individual clients */}
                           {clients.map((client) => (
                             <div
                               key={client}
-                              className="flex items-center justify-between py-1.5 px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors"
+                              className="flex items-center justify-between py-1.5 px-3 rounded-oid-xxs hover:bg-oid-surface-hover/50 transition-colors"
                             >
-                              <span className="text-sm text-gray-700 dark:text-gray-300">
+                              <span className="text-sm text-oid-sub">
                                 {client}
                               </span>
                               <div className="flex items-center gap-2">
@@ -376,16 +376,16 @@ export default function RCAList() {
 
       {/* Edit password modal */}
       {editTarget && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 w-full max-w-sm">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="card-strong w-full max-w-sm animate-fade-up">
             <div className="flex items-center gap-2 mb-4">
-              <Lock className="w-5 h-5 text-primary-600" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <Lock className="w-5 h-5 text-orange" />
+              <h3 className="text-lg font-semibold text-oid-text">
                 Senha de Edição
               </h3>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-              Digite a senha para editar a RCA <strong>{editTarget}</strong>
+            <p className="text-sm text-oid-sub mb-4">
+              Digite a senha para editar a RCA <strong className="text-oid-text">{editTarget}</strong>
             </p>
             <input
               type="password"
@@ -397,7 +397,7 @@ export default function RCAList() {
               autoFocus
             />
             {editPwError && (
-              <p className="text-sm text-red-600 mb-3">{editPwError}</p>
+              <p className="text-sm text-status-red mb-3 animate-fade-in">{editPwError}</p>
             )}
             <div className="flex gap-2 mt-4">
               <button onClick={handleEditConfirm} className="btn-primary flex-1">

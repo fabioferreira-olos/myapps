@@ -8,7 +8,6 @@ import {
   Shield,
   CheckCircle,
   MessageSquare,
-  X,
 } from 'lucide-react'
 import { RCASection } from '../types/rca'
 import RichTextEditor from './RichTextEditor'
@@ -44,16 +43,16 @@ export default function RCAForm() {
   return (
     <div className="flex h-full">
       {/* Sidebar Navigation */}
-      <nav className="w-56 flex-shrink-0 border-r border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 overflow-y-auto">
+      <nav className="w-56 flex-shrink-0 border-r border-oid-border bg-[rgba(0,0,40,0.30)] backdrop-blur-glass overflow-y-auto">
         <div className="py-4">
           {sections.map((section) => (
             <button
               key={section.id}
               onClick={() => setActiveSection(section.id)}
-              className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-colors ${
+              className={`w-full flex items-center gap-2 px-4 py-2.5 text-sm text-left transition-all ${
                 activeSection === section.id
-                  ? 'bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 border-r-2 border-primary-600'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+                  ? 'bg-orange/10 text-orange border-r-2 border-orange font-semibold'
+                  : 'text-oid-sub hover:bg-oid-surface-soft hover:text-oid-text'
               }`}
             >
               {section.icon}
@@ -66,8 +65,8 @@ export default function RCAForm() {
       {/* Form Content */}
       <div className="flex-1 overflow-y-auto p-6">
         {activeSection === 'metadata' && (
-          <div className="space-y-4 max-w-3xl">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Informações Gerais</h2>
+          <div className="space-y-4 max-w-3xl animate-fade-up">
+            <h2 className="text-xl font-bold text-oid-text mb-4">Informações Gerais</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="label">Título do RCA</label>
@@ -123,8 +122,8 @@ export default function RCAForm() {
         )}
 
         {activeSection === 'incident' && (
-          <div className="space-y-4 max-w-3xl">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Informações do Incidente</h2>
+          <div className="space-y-4 max-w-3xl animate-fade-up">
+            <h2 className="text-xl font-bold text-oid-text mb-4">Informações do Incidente</h2>
             <div>
               <label className="label">Descrição do Incidente</label>
               <textarea
@@ -165,8 +164,8 @@ export default function RCAForm() {
         )}
 
         {activeSection === 'impact' && (
-          <div className="space-y-4 max-w-3xl">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Impacto</h2>
+          <div className="space-y-4 max-w-3xl animate-fade-up">
+            <h2 className="text-xl font-bold text-oid-text mb-4">Impacto</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
               <div>
                 <label className="label">Clientes Afetados</label>
@@ -192,7 +191,7 @@ export default function RCAForm() {
                 {doc.affectedClients.split(', ').filter(Boolean).map((name) => (
                   <span
                     key={name}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-200"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-orange/10 border border-orange/25 text-orange"
                   >
                     {name}
                     <button
@@ -201,9 +200,9 @@ export default function RCAForm() {
                         const current = doc.affectedClients.split(', ').filter(Boolean)
                         updateField('affectedClients', current.filter((c) => c !== name).join(', '))
                       }}
-                      className="hover:text-primary-600 dark:hover:text-primary-100"
+                      className="hover:text-orange-light"
                     >
-                      <X className="w-3 h-3" />
+                      ×
                     </button>
                   </span>
                 ))}
@@ -224,8 +223,8 @@ export default function RCAForm() {
         {activeSection === 'timeline' && <TimelineEditor />}
 
         {activeSection === 'rootCause' && (
-          <div className="space-y-4 max-w-3xl">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Causa Raiz</h2>
+          <div className="space-y-4 max-w-3xl animate-fade-up">
+            <h2 className="text-xl font-bold text-oid-text mb-4">Causa Raiz</h2>
             <RichTextEditor
               value={doc.rootCause}
               onChange={(val) => updateField('rootCause', val)}
@@ -257,8 +256,8 @@ export default function RCAForm() {
         )}
 
         {activeSection === 'considerations' && (
-          <div className="space-y-4 max-w-3xl">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Considerações Finais</h2>
+          <div className="space-y-4 max-w-3xl animate-fade-up">
+            <h2 className="text-xl font-bold text-oid-text mb-4">Considerações Finais</h2>
             <RichTextEditor
               value={doc.considerations}
               onChange={(val) => updateField('considerations', val)}

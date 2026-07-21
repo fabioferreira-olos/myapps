@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { FileText, Eye, EyeOff, Settings, RotateCcw, Save, Database, List, HelpCircle, BarChart3 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import ThemeToggle from './ThemeToggle'
 import { useRCAStore } from '../context/RCAContext'
 import { publishRCA, updateRCA } from '../services/apiService'
 
@@ -64,11 +63,14 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-3 sticky top-0 z-50">
+    <header className="bg-[rgba(0,0,40,0.55)] backdrop-blur-glass border-b border-oid-border px-6 py-3 sticky top-0 z-50">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <FileText className="w-7 h-7 text-primary-600" />
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+          {/* Logo icon */}
+          <div className="w-9 h-9 rounded-oid-xs bg-gradient-to-br from-orange to-orange-light flex items-center justify-center shadow-orange-glow">
+            <FileText className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-xl font-bold text-oid-text">
             Gerador de RCA
           </h1>
           <button
@@ -87,7 +89,7 @@ export default function Header() {
 
         {/* Status central */}
         <div className="hidden sm:flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+          <span className="text-sm font-medium text-oid-sub">
             {rcaId ? `Editando RCA ${rcaId}` : 'Editando RCA nova'}
           </span>
         </div>
@@ -105,7 +107,7 @@ export default function Header() {
           <button
             onClick={handlePublish}
             disabled={publishing}
-            className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 flex items-center gap-2 text-sm"
+            className="btn-primary flex items-center gap-2 text-sm"
             title="Gravar no Banco"
           >
             <Database className="w-4 h-4" />
@@ -147,8 +149,6 @@ export default function Header() {
             <Settings className="w-4 h-4" />
           </button>
 
-          <ThemeToggle />
-
           <button
             onClick={() => navigate('/guia')}
             className="btn-secondary flex items-center gap-2 text-sm"
@@ -161,10 +161,10 @@ export default function Header() {
 
       {/* Status message */}
       {message && (
-        <div className={`mt-2 px-3 py-1.5 rounded text-sm ${
+        <div className={`mt-2 px-3 py-1.5 rounded-oid-xxs text-sm animate-fade-in ${
           message.type === 'success'
-            ? 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200'
-            : 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200'
+            ? 'bg-status-green-bg border border-status-green-border text-status-green'
+            : 'bg-status-red-bg border border-status-red-border text-status-red'
         }`}>
           {message.text}
         </div>

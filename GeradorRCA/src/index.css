@@ -3,40 +3,113 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    min-height: 100%;
+    background-color: #00001a;
+    background-image:
+      radial-gradient(at 80% 0%, rgba(0, 55, 240, 0.90) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(0, 15, 200, 0.85) 0px, transparent 50%),
+      radial-gradient(at 0% 0%, rgba(0, 0, 30, 1.00) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(251, 92, 40, 0.18) 0px, transparent 40%),
+      radial-gradient(at 45% 55%, rgba(0, 20, 160, 0.55) 0px, transparent 55%);
+    background-attachment: fixed;
+  }
+
   body {
-    @apply text-gray-900 dark:text-gray-100;
+    @apply min-h-screen font-ui text-oid-text;
+    background: transparent;
+  }
+
+  /* Animated blobs */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -10%;
+    right: -5%;
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, rgba(251, 92, 40, 0.18) 0%, transparent 65%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: blobDrift1 22s ease-in-out infinite;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -10%;
+    left: -10%;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(20, 70, 255, 0.28) 0%, transparent 65%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: blobDrift2 28s ease-in-out infinite;
+  }
+
+  #root {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+  }
+
+  /* Scrollbar dark */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+  /* Dark inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="date"],
+  input[type="datetime-local"],
+  select,
+  textarea {
+    color-scheme: dark;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-gradient-to-br from-orange to-orange-light text-white font-semibold py-2 px-4 rounded-oid-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-orange-glow hover:shadow-orange-glow-lg hover:scale-[1.02];
   }
 
   .btn-secondary {
-    @apply bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-oid-surface hover:bg-oid-surface-hover text-oid-text font-medium py-2 px-4 rounded-oid-sm border border-oid-border transition-all duration-200 backdrop-blur-glass;
   }
 
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+    @apply bg-status-red/20 hover:bg-status-red/30 text-status-red border border-status-red/30 font-medium py-2 px-4 rounded-oid-sm transition-all duration-200;
   }
 
   .input-field {
-    @apply w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-colors duration-200;
+    @apply w-full px-3 py-2 border border-oid-border rounded-oid-sm bg-oid-surface-soft text-oid-text placeholder:text-oid-muted/60 focus:ring-2 focus:ring-accent-glow focus:border-accent/50 outline-none transition-all duration-200 backdrop-blur-glass;
   }
 
   .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6;
+    @apply bg-oid-surface backdrop-blur-glass saturate-glass border border-oid-border rounded-oid-md shadow-glass p-6;
+  }
+
+  .card-strong {
+    @apply bg-[rgba(255,255,255,0.10)] backdrop-blur-glass-strong saturate-glass border border-oid-border-strong rounded-oid-lg shadow-glass-strong p-8;
   }
 
   .label {
-    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
+    @apply block text-sm font-semibold text-oid-sub mb-1 tracking-[0.01em];
+  }
+
+  .label-uppercase {
+    @apply block text-[11px] font-extrabold text-oid-muted uppercase tracking-[0.08em];
   }
 }
 
 /* Tiptap editor styles */
 .tiptap {
-  @apply max-w-none p-3 min-h-[120px] focus:outline-none text-gray-900 dark:text-gray-100;
+  @apply max-w-none p-3 min-h-[120px] focus:outline-none text-oid-text;
 }
 
 .tiptap p {

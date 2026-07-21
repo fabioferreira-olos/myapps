@@ -38,13 +38,13 @@ export default function RichTextEditor({ value, onChange, placeholder, aiField }
   }
 
   return (
-    <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
-      <div className="flex items-center gap-1 border-b border-gray-300 dark:border-gray-600 p-2 bg-gray-50 dark:bg-gray-700">
+    <div className="border border-oid-border rounded-oid-sm overflow-hidden bg-oid-surface-soft backdrop-blur-glass">
+      <div className="flex items-center gap-1 border-b border-oid-border p-2 bg-[rgba(255,255,255,0.04)]">
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 ${
-            editor.isActive('bold') ? 'bg-gray-200 dark:bg-gray-600' : ''
+          className={`p-1.5 rounded-oid-xxs text-oid-sub hover:bg-oid-surface-hover hover:text-oid-text transition-colors ${
+            editor.isActive('bold') ? 'bg-oid-surface text-oid-text' : ''
           }`}
           title="Negrito"
         >
@@ -53,8 +53,8 @@ export default function RichTextEditor({ value, onChange, placeholder, aiField }
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 ${
-            editor.isActive('italic') ? 'bg-gray-200 dark:bg-gray-600' : ''
+          className={`p-1.5 rounded-oid-xxs text-oid-sub hover:bg-oid-surface-hover hover:text-oid-text transition-colors ${
+            editor.isActive('italic') ? 'bg-oid-surface text-oid-text' : ''
           }`}
           title="Itálico"
         >
@@ -63,8 +63,8 @@ export default function RichTextEditor({ value, onChange, placeholder, aiField }
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 ${
-            editor.isActive('bulletList') ? 'bg-gray-200 dark:bg-gray-600' : ''
+          className={`p-1.5 rounded-oid-xxs text-oid-sub hover:bg-oid-surface-hover hover:text-oid-text transition-colors ${
+            editor.isActive('bulletList') ? 'bg-oid-surface text-oid-text' : ''
           }`}
           title="Lista com marcadores"
         >
@@ -73,8 +73,8 @@ export default function RichTextEditor({ value, onChange, placeholder, aiField }
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-600 ${
-            editor.isActive('orderedList') ? 'bg-gray-200 dark:bg-gray-600' : ''
+          className={`p-1.5 rounded-oid-xxs text-oid-sub hover:bg-oid-surface-hover hover:text-oid-text transition-colors ${
+            editor.isActive('orderedList') ? 'bg-oid-surface text-oid-text' : ''
           }`}
           title="Lista numerada"
         >
@@ -83,11 +83,11 @@ export default function RichTextEditor({ value, onChange, placeholder, aiField }
 
         {aiField && (
           <>
-            <div className="w-px h-5 bg-gray-300 dark:bg-gray-600 mx-1" />
+            <div className="w-px h-5 bg-oid-border mx-1" />
             <button
               type="button"
               onClick={() => setAIPanelOpen(true, aiField)}
-              className="p-1.5 rounded hover:bg-purple-100 dark:hover:bg-purple-900 text-purple-600 dark:text-purple-400"
+              className="p-1.5 rounded-oid-xxs text-accent-light hover:bg-accent-glow transition-colors"
               title="Sugestão da IA"
             >
               <Sparkles className="w-4 h-4" />
@@ -97,7 +97,7 @@ export default function RichTextEditor({ value, onChange, placeholder, aiField }
       </div>
       <EditorContent editor={editor} />
       {placeholder && !value && (
-        <div className="px-3 py-2 text-gray-400 text-sm pointer-events-none absolute">
+        <div className="px-3 py-2 text-oid-muted/60 text-sm pointer-events-none absolute">
           {placeholder}
         </div>
       )}

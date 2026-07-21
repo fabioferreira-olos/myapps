@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import { Search, X } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { fetchClients, Client } from '../services/apiService'
 
 interface ClientSelectorProps {
@@ -41,19 +41,15 @@ export default function ClientSelector({ selected, onChange }: ClientSelectorPro
     }
   }
 
-  const removeClient = (name: string) => {
-    onChange(selected.filter((s) => s !== name))
-  }
-
   if (loading) {
-    return <div className="text-sm text-gray-500 dark:text-gray-400">Carregando clientes...</div>
+    return <div className="text-sm text-oid-muted">Carregando clientes...</div>
   }
 
   return (
     <div className="space-y-2">
       {/* Search input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-oid-muted" />
         <input
           type="text"
           value={search}
@@ -64,9 +60,9 @@ export default function ClientSelector({ selected, onChange }: ClientSelectorPro
       </div>
 
       {/* Client list */}
-      <div className="max-h-48 overflow-y-auto border border-gray-200 dark:border-gray-600 rounded-lg">
+      <div className="max-h-48 overflow-y-auto border border-oid-border rounded-oid-sm bg-oid-surface-soft">
         {filtered.length === 0 ? (
-          <div className="p-3 text-sm text-gray-500 dark:text-gray-400 text-center">
+          <div className="p-3 text-sm text-oid-muted text-center">
             Nenhum cliente encontrado
           </div>
         ) : (
@@ -75,17 +71,17 @@ export default function ClientSelector({ selected, onChange }: ClientSelectorPro
             return (
               <label
                 key={client.id}
-                className={`flex items-center gap-2 px-3 py-2 cursor-pointer text-sm transition-colors border-b border-gray-100 dark:border-gray-700 last:border-b-0 ${
+                className={`flex items-center gap-2 px-3 py-2 cursor-pointer text-sm transition-colors border-b border-oid-border-soft last:border-b-0 ${
                   isSelected
-                    ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-800 dark:text-primary-200'
-                    : 'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300'
+                    ? 'bg-orange/10 text-orange'
+                    : 'hover:bg-oid-surface-hover text-oid-sub'
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={isSelected}
                   onChange={() => toggleClient(client.name)}
-                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500"
+                  className="w-4 h-4 rounded border-oid-border text-orange focus:ring-accent-glow"
                 />
                 {client.name}
               </label>

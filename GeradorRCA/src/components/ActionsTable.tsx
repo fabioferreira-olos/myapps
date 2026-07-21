@@ -1,6 +1,5 @@
 import { Plus, Trash2 } from 'lucide-react'
 import { ActionItem } from '../types/rca'
-import { getStatusLabel, getStatusColor } from '../utils/formatters'
 
 interface ActionsTableProps {
   title: string
@@ -13,9 +12,9 @@ interface ActionsTableProps {
 
 export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove, showActionType }: ActionsTableProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 animate-fade-up">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{title}</h3>
+        <h3 className="text-lg font-semibold text-oid-text">{title}</h3>
         <button onClick={onAdd} className="btn-primary flex items-center gap-2 text-sm">
           <Plus className="w-4 h-4" />
           Adicionar Ação
@@ -23,7 +22,7 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
       </div>
 
       {actions.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg">
+        <div className="text-center py-8 text-oid-muted border-2 border-dashed border-oid-border rounded-oid-md">
           <p>Nenhuma ação adicionada</p>
           <p className="text-sm">Clique em "Adicionar Ação" para começar</p>
         </div>
@@ -31,31 +30,31 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-100 dark:bg-gray-700">
-                <th className="text-left p-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">
+              <tr className="bg-[rgba(255,255,255,0.04)]">
+                <th className="text-left p-3 text-sm font-semibold text-oid-sub border-b border-oid-border">
                   Descrição
                 </th>
-                <th className="text-left p-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 w-40">
+                <th className="text-left p-3 text-sm font-semibold text-oid-sub border-b border-oid-border w-40">
                   Responsável
                 </th>
-                <th className="text-left p-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 w-36">
+                <th className="text-left p-3 text-sm font-semibold text-oid-sub border-b border-oid-border w-36">
                   Prazo
                 </th>
-                <th className="text-left p-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 w-36">
+                <th className="text-left p-3 text-sm font-semibold text-oid-sub border-b border-oid-border w-36">
                   Status
                 </th>
                 {showActionType && (
-                  <th className="text-left p-3 text-sm font-medium text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600 w-36">
+                  <th className="text-left p-3 text-sm font-semibold text-oid-sub border-b border-oid-border w-36">
                     Tipo *
                   </th>
                 )}
-                <th className="p-3 w-10 border-b border-gray-200 dark:border-gray-600"></th>
+                <th className="p-3 w-10 border-b border-oid-border"></th>
               </tr>
             </thead>
             <tbody>
               {actions.map((action) => (
-                <tr key={action.id} className="group hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                  <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
+                <tr key={action.id} className="group hover:bg-oid-surface-soft transition-colors">
+                  <td className="p-2 border-b border-oid-border-soft align-top">
                     <input
                       type="text"
                       value={action.description}
@@ -64,7 +63,7 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
                       placeholder="Descreva a ação..."
                     />
                   </td>
-                  <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
+                  <td className="p-2 border-b border-oid-border-soft align-top">
                     <input
                       type="text"
                       value={action.responsible}
@@ -73,7 +72,7 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
                       placeholder="Responsável"
                     />
                   </td>
-                  <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
+                  <td className="p-2 border-b border-oid-border-soft align-top">
                     <input
                       type="date"
                       value={action.deadline}
@@ -81,7 +80,7 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
                       className="input-field text-sm"
                     />
                   </td>
-                  <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
+                  <td className="p-2 border-b border-oid-border-soft align-top">
                     <select
                       value={action.status}
                       onChange={(e) => onUpdate(action.id, 'status', e.target.value)}
@@ -93,7 +92,7 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
                     </select>
                   </td>
                   {showActionType && (
-                    <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
+                    <td className="p-2 border-b border-oid-border-soft align-top">
                       <select
                         value={action.actionType || ''}
                         onChange={(e) => onUpdate(action.id, 'actionType', e.target.value)}
@@ -105,10 +104,10 @@ export default function ActionsTable({ title, actions, onAdd, onUpdate, onRemove
                       </select>
                     </td>
                   )}
-                  <td className="p-2 border-b border-gray-100 dark:border-gray-700 align-top">
+                  <td className="p-2 border-b border-oid-border-soft align-top">
                     <button
                       onClick={() => onRemove(action.id)}
-                      className="p-1.5 text-red-500 hover:bg-red-100 dark:hover:bg-red-900 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="p-1.5 text-status-red hover:bg-status-red-bg rounded-oid-xxs opacity-0 group-hover:opacity-100 transition-opacity"
                       title="Remover ação"
                     >
                       <Trash2 className="w-4 h-4" />
