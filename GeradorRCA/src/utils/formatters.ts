@@ -55,6 +55,15 @@ export function getActionTypeLabel(value: string): string {
   return labels[value] || ''
 }
 
+export function getIncidentTypeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    platform: 'Plataforma',
+    infrastructure: 'Infraestrutura',
+    other: 'Outros',
+  }
+  return labels[value] || ''
+}
+
 export function getStatusColor(status: string): string {
   const colors: Record<string, string> = {
     pending: 'bg-status-amber-bg text-status-amber border border-status-amber-border',

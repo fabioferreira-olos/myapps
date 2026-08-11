@@ -1,6 +1,6 @@
 import jsPDF from 'jspdf'
 import { RCADocument } from '../types/rca'
-import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml, calculateDowntime } from '../utils/formatters'
+import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml, calculateDowntime, getIncidentTypeLabel } from '../utils/formatters'
 
 const COMPANY_NAME = 'Olos Tecnologia'
 const COMPANY_ADDRESS = 'Torre Milano - Av. Francisco Matarazzo,\n1400 - 13°Andar - Água Branca,\nSão Paulo/SP - CEP 05001-903'
@@ -187,6 +187,11 @@ export async function exportToPdf(doc: RCADocument, clientName?: string): Promis
 
   // Description
   addField('Descrição', doc.description)
+
+  // Incident type
+  if (doc.incidentType) {
+    addField('Tipo do Incidente', getIncidentTypeLabel(doc.incidentType))
+  }
 
   // Dates (from timeline calculation or legacy fields)
   const startFormatted = timelineStart ? formatDateTime(timelineStart) : ''

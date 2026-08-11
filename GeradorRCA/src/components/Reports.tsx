@@ -29,6 +29,7 @@ export default function Reports() {
   })
   const [downtimePage, setDowntimePage] = useState(0)
   const [slaPage, setSlaPage] = useState(0)
+  const [incidentTypeFilter, setIncidentTypeFilter] = useState('')
   const PAGE_SIZE = 15
 
   useEffect(() => {
@@ -43,6 +44,7 @@ export default function Reports() {
       const params = new URLSearchParams()
       if (dateFrom) params.set('from', dateFrom)
       if (dateTo) params.set('to', dateTo)
+      if (incidentTypeFilter) params.set('type', incidentTypeFilter)
 
       const [downtimeRes, slaRes] = await Promise.all([
         fetch(`/api/reports/downtime-by-client?${params}`),
@@ -151,6 +153,19 @@ export default function Reports() {
                   className="input-field pl-9"
                 />
               </div>
+            </div>
+            <div>
+              <label className="label">Tipo de Incidente</label>
+              <select
+                value={incidentTypeFilter}
+                onChange={(e) => setIncidentTypeFilter(e.target.value)}
+                className="input-field"
+              >
+                <option value="">Todos</option>
+                <option value="platform">Plataforma</option>
+                <option value="infrastructure">Infraestrutura</option>
+                <option value="other">Outros</option>
+              </select>
             </div>
             <div>
               <label className="label">&nbsp;</label>

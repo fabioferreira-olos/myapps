@@ -29,6 +29,7 @@ export interface RCADocument {
   totalDowntime?: string;
   recurrence: 'yes' | 'no' | '';
   unavailability: 'none' | 'partial' | 'total' | '';
+  incidentType: 'platform' | 'infrastructure' | 'other' | '';
   hideDowntime: boolean;
 
   // Impact

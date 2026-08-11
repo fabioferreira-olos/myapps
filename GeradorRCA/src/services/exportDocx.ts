@@ -8,7 +8,7 @@ import {
 } from 'docx'
 import { saveAs } from 'file-saver'
 import { RCADocument } from '../types/rca'
-import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml, calculateDowntime } from '../utils/formatters'
+import { formatDateTime, getStatusLabel, getActionTypeLabel, getRecurrenceLabel, getUnavailabilityLabel, stripHtml, calculateDowntime, getIncidentTypeLabel } from '../utils/formatters'
 
 const COMPANY_NAME = 'Olos Tecnologia'
 const COMPANY_ADDRESS = 'Torre Milano - Av. Francisco Matarazzo, 1400 - 13°Andar - Água Branca, São Paulo/SP - CEP 05001-903'
@@ -135,6 +135,11 @@ export async function exportToDocx(doc: RCADocument, clientName?: string): Promi
 
   // Description
   addField('Descrição', doc.description)
+
+  // Incident type
+  if (doc.incidentType) {
+    addField('Tipo do Incidente', getIncidentTypeLabel(doc.incidentType))
+  }
 
   // Dates (from timeline calculation or legacy fields)
   const startFormatted = timelineStart ? formatDateTime(timelineStart) : 'N/A'

@@ -16,6 +16,7 @@ function createEmptyRCA(): RCADocument {
     description: '',
     recurrence: '',
     unavailability: '',
+    incidentType: '',
     hideDowntime: false,
     affectedClients: '',
     affectedServices: '',

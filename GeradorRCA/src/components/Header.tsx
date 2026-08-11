@@ -13,6 +13,7 @@ function validateDocument(doc: any): string[] {
   if (!doc.createdAt) errors.push('Data de Criação')
   if (!doc.description || doc.description.length < minLen) errors.push('Descrição do Incidente (mín. 5 caracteres)')
   if (doc.timeline.length < 2) errors.push('Linha do Tempo (pelo menos 2 eventos)')
+  if (!doc.incidentType) errors.push('Tipo do Incidente')
   if (!doc.recurrence) errors.push('Reincidência')
   if (!doc.unavailability) errors.push('Indisponibilidade')
   if (!doc.affectedClients || doc.affectedClients.length < minLen) errors.push('Clientes Afetados')

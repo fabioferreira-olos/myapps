@@ -330,9 +330,9 @@ app.post('/api/auth/verify-edit-password', async (req, res) => {
 
 // ========== REPORTS ==========
 
-// GET /api/reports/downtime-by-client?from=YYYY-MM-DD&to=YYYY-MM-DD
+// GET /api/reports/downtime-by-client?from=YYYY-MM-DD&to=YYYY-MM-DD&type=platform|infrastructure|other
 app.get('/api/reports/downtime-by-client', async (req, res) => {
-  const { from, to } = req.query
+  const { from, to, type } = req.query
   try {
     let query = 'SELECT id, data, created_at FROM rcas'
     const params = []
@@ -359,6 +359,9 @@ app.get('/api/reports/downtime-by-client', async (req, res) => {
     for (const row of result.rows) {
       const data = row.data
       if (!data.affectedClients) continue
+
+      // Filter by incident type if specified
+      if (type && data.incidentType !== type) continue
 
       // Calculate downtime from timeline (preferred) or legacy startDate/endDate
       let diffMs = 0
@@ -394,9 +397,9 @@ app.get('/api/reports/downtime-by-client', async (req, res) => {
   }
 })
 
-// GET /api/reports/sla-by-client?from=YYYY-MM-DD&to=YYYY-MM-DD
+// GET /api/reports/sla-by-client?from=YYYY-MM-DD&to=YYYY-MM-DD&type=platform|infrastructure|other
 app.get('/api/reports/sla-by-client', async (req, res) => {
-  const { from, to } = req.query
+  const { from, to, type } = req.query
   try {
     // Calculate total hours in the selected period
     const startDate = from ? new Date(from) : new Date(new Date().getFullYear(), 0, 1)
@@ -433,6 +436,9 @@ app.get('/api/reports/sla-by-client', async (req, res) => {
     for (const row of result.rows) {
       const data = row.data
       if (!data.affectedClients) continue
+
+      // Filter by incident type if specified
+      if (type && data.incidentType !== type) continue
 
       // Calculate downtime from timeline (preferred) or legacy startDate/endDate
       let diffMs = 0

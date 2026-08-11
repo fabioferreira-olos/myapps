@@ -1,5 +1,5 @@
 import { useRCAStore } from '../context/RCAContext'
-import { formatDateTime, getStatusLabel, getStatusColor, calculateDowntime } from '../utils/formatters'
+import { formatDateTime, getStatusLabel, getStatusColor, calculateDowntime, getIncidentTypeLabel } from '../utils/formatters'
 import { useMemo } from 'react'
 
 export default function RCAPreview() {
@@ -44,6 +44,11 @@ export default function RCAPreview() {
         {/* Incident */}
         <Section title="Informações do Incidente">
           <Field label="Descrição" value={doc.description} />
+          {doc.incidentType && (
+            <div className="mt-3">
+              <Field label="Tipo do Incidente" value={getIncidentTypeLabel(doc.incidentType)} />
+            </div>
+          )}
           {timelineStats && (
             <div className="grid grid-cols-2 gap-4 mt-3">
               <Field label="Início" value={formatDateTime(timelineStats.startDate)} />

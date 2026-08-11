@@ -135,6 +135,19 @@ export default function RCAForm() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
+                <label className="label">Tipo do Incidente *</label>
+                <select
+                  value={doc.incidentType}
+                  onChange={(e) => updateField('incidentType', e.target.value)}
+                  className="input-field"
+                >
+                  <option value="" disabled>Selecione...</option>
+                  <option value="platform">Plataforma</option>
+                  <option value="infrastructure">Infraestrutura</option>
+                  <option value="other">Outros</option>
+                </select>
+              </div>
+              <div>
                 <label className="label">Reincidência *</label>
                 <select
                   value={doc.recurrence}
