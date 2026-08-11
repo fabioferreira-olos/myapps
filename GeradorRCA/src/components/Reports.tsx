@@ -110,6 +110,25 @@ export default function Reports() {
     return 'bg-oid-surface-soft border border-oid-border text-oid-sub'
   }
 
+  function calculatePercentile(values: number[], p: number): number {
+    if (values.length === 0) return 0
+    const sorted = [...values].sort((a, b) => a - b)
+    const index = Math.ceil((p / 100) * sorted.length) - 1
+    return sorted[Math.max(0, Math.min(index, sorted.length - 1))]
+  }
+
+  // Percentiles for downtime (P95/P98/P99 = top values, higher = worse)
+  const downtimeValues = downtimeData.map((d) => d.hours)
+  const downtimeP95 = calculatePercentile(downtimeValues, 95)
+  const downtimeP98 = calculatePercentile(downtimeValues, 98)
+  const downtimeP99 = calculatePercentile(downtimeValues, 99)
+
+  // Percentiles for SLA (P5/P2/P1 from bottom = worst clients)
+  const slaValues = slaData.map((d) => d.sla)
+  const slaP95 = calculatePercentile(slaValues, 5)   // 5% worst → P95 guarantee
+  const slaP98 = calculatePercentile(slaValues, 2)   // 2% worst → P98 guarantee
+  const slaP99 = calculatePercentile(slaValues, 1)   // 1% worst → P99 guarantee
+
   return (
     <div className="min-h-screen p-4 md:p-8 animate-fade-up">
       <div className="max-w-6xl mx-auto">
@@ -191,6 +210,67 @@ export default function Reports() {
           </div>
         ) : (
           <div className="space-y-6">
+            {/* Percentiles Summary Card */}
+            {(downtimeData.length > 0 || slaData.length > 0) && (
+              <div className="card">
+                <h2 className="text-lg font-semibold text-oid-text mb-4">Percentis</h2>
+                {downtimeData.length < 5 && (
+                  <p className="text-xs text-oid-muted mb-3">* Amostra com menos de 5 clientes — percentis podem não ser representativos.</p>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Downtime percentiles */}
+                  {downtimeData.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-oid-sub mb-3 flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-orange" />
+                        Indisponibilidade
+                      </h3>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
+                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P95</div>
+                          <div className="text-lg font-bold font-mono text-oid-text">{downtimeP95.toFixed(2)}h</div>
+                        </div>
+                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
+                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P98</div>
+                          <div className="text-lg font-bold font-mono text-oid-text">{downtimeP98.toFixed(2)}h</div>
+                        </div>
+                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
+                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P99</div>
+                          <div className="text-lg font-bold font-mono text-oid-text">{downtimeP99.toFixed(2)}h</div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-oid-muted mt-2">95%/98%/99% dos clientes tiveram indisponibilidade ≤ este valor</p>
+                    </div>
+                  )}
+
+                  {/* SLA percentiles */}
+                  {slaData.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-oid-sub mb-3 flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-accent-light" />
+                        SLA
+                      </h3>
+                      <div className="grid grid-cols-3 gap-3">
+                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
+                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P95</div>
+                          <div className={`text-lg font-bold font-mono ${slaP95 >= 99.9 ? 'text-status-green' : slaP95 >= 99 ? 'text-status-amber' : 'text-status-red'}`}>{slaP95.toFixed(2)}%</div>
+                        </div>
+                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
+                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P98</div>
+                          <div className={`text-lg font-bold font-mono ${slaP98 >= 99.9 ? 'text-status-green' : slaP98 >= 99 ? 'text-status-amber' : 'text-status-red'}`}>{slaP98.toFixed(2)}%</div>
+                        </div>
+                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
+                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P99</div>
+                          <div className={`text-lg font-bold font-mono ${slaP99 >= 99.9 ? 'text-status-green' : slaP99 >= 99 ? 'text-status-amber' : 'text-status-red'}`}>{slaP99.toFixed(2)}%</div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-oid-muted mt-2">95%/98%/99% dos clientes tiveram SLA ≥ este valor</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Report 1: Downtime by Client */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
