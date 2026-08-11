@@ -71,6 +71,11 @@
   textarea {
     color-scheme: dark;
   }
+
+  select option {
+    background-color: #ffffff;
+    color: #000000;
+  }
 }
 
 @layer components {
