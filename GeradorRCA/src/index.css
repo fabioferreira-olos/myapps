@@ -67,14 +67,21 @@
   input[type="password"],
   input[type="date"],
   input[type="datetime-local"],
-  select,
   textarea {
     color-scheme: dark;
   }
 
+  select {
+    color-scheme: light;
+  }
+
   select option {
     background-color: #ffffff;
-    color: #000000;
+    color: #000000 !important;
+  }
+
+  select option:disabled {
+    color: #666666 !important;
   }
 }
 
