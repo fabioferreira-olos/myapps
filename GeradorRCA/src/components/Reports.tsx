@@ -210,67 +210,6 @@ export default function Reports() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Percentiles Summary Card */}
-            {(downtimeData.length > 0 || slaData.length > 0) && (
-              <div className="card">
-                <h2 className="text-lg font-semibold text-oid-text mb-4">Percentis</h2>
-                {downtimeData.length < 5 && (
-                  <p className="text-xs text-oid-muted mb-3">* Amostra com menos de 5 clientes — percentis podem não ser representativos.</p>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Downtime percentiles */}
-                  {downtimeData.length > 0 && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-oid-sub mb-3 flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-orange" />
-                        Indisponibilidade
-                      </h3>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
-                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P95</div>
-                          <div className="text-lg font-bold font-mono text-oid-text">{downtimeP95.toFixed(2)}h</div>
-                        </div>
-                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
-                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P98</div>
-                          <div className="text-lg font-bold font-mono text-oid-text">{downtimeP98.toFixed(2)}h</div>
-                        </div>
-                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
-                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P99</div>
-                          <div className="text-lg font-bold font-mono text-oid-text">{downtimeP99.toFixed(2)}h</div>
-                        </div>
-                      </div>
-                      <p className="text-xs text-oid-muted mt-2">95%/98%/99% dos clientes tiveram indisponibilidade ≤ este valor</p>
-                    </div>
-                  )}
-
-                  {/* SLA percentiles */}
-                  {slaData.length > 0 && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-oid-sub mb-3 flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-accent-light" />
-                        SLA
-                      </h3>
-                      <div className="grid grid-cols-3 gap-3">
-                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
-                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P95</div>
-                          <div className={`text-lg font-bold font-mono ${slaP95 >= 99.9 ? 'text-status-green' : slaP95 >= 99 ? 'text-status-amber' : 'text-status-red'}`}>{slaP95.toFixed(2)}%</div>
-                        </div>
-                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
-                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P98</div>
-                          <div className={`text-lg font-bold font-mono ${slaP98 >= 99.9 ? 'text-status-green' : slaP98 >= 99 ? 'text-status-amber' : 'text-status-red'}`}>{slaP98.toFixed(2)}%</div>
-                        </div>
-                        <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3 text-center">
-                          <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-1">P99</div>
-                          <div className={`text-lg font-bold font-mono ${slaP99 >= 99.9 ? 'text-status-green' : slaP99 >= 99 ? 'text-status-amber' : 'text-status-red'}`}>{slaP99.toFixed(2)}%</div>
-                        </div>
-                      </div>
-                      <p className="text-xs text-oid-muted mt-2">95%/98%/99% dos clientes tiveram SLA ≥ este valor</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
             {/* Report 1: Downtime by Client */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
@@ -384,8 +323,8 @@ export default function Reports() {
                 </h2>
                 {slaData.length > 0 && (
                   <span className="text-sm text-oid-muted">
-                    SLA médio: <strong className={`font-mono ${avgSla >= 99.9 ? 'text-status-green' : avgSla >= 99 ? 'text-status-amber' : 'text-status-red'}`}>
-                      {avgSla.toFixed(2)}%
+                    SLA P99: <strong className={`font-mono ${slaP99 >= 99.9 ? 'text-status-green' : slaP99 >= 99 ? 'text-status-amber' : 'text-status-red'}`}>
+                      {slaP99.toFixed(2)}%
                     </strong>
                   </span>
                 )}
@@ -445,24 +384,65 @@ export default function Reports() {
                     <tfoot>
                       <tr className="border-t-2 border-oid-border bg-[rgba(255,255,255,0.04)]">
                         <td className="py-3 px-4" colSpan={2}>
-                          <span className="font-semibold text-oid-text">Média Geral</span>
+                          <span className="font-semibold text-oid-text">P95</span>
                         </td>
                         <td className="py-3 px-4 text-right font-mono text-oid-sub">
-                          {(slaData.reduce((sum, d) => sum + d.downtime, 0)).toFixed(2)}h
                         </td>
                         <td className="py-3 px-4 text-right">
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                            avgSla >= 99.9
+                            slaP95 >= 99.9
                               ? 'bg-status-green-bg border border-status-green-border text-status-green'
-                              : avgSla >= 99
+                              : slaP95 >= 99
                                 ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
                                 : 'bg-status-red-bg border border-status-red-border text-status-red'
                           }`}>
-                            {avgSla.toFixed(2)}%
+                            {slaP95.toFixed(2)}%
                           </span>
                         </td>
                         <td className="py-3 px-4 text-center">
-                          {getSlaStatusBadge(avgSla)}
+                          {getSlaStatusBadge(slaP95)}
+                        </td>
+                      </tr>
+                      <tr className="bg-[rgba(255,255,255,0.04)]">
+                        <td className="py-3 px-4" colSpan={2}>
+                          <span className="font-semibold text-oid-text">P98</span>
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono text-oid-sub">
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                            slaP98 >= 99.9
+                              ? 'bg-status-green-bg border border-status-green-border text-status-green'
+                              : slaP98 >= 99
+                                ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
+                                : 'bg-status-red-bg border border-status-red-border text-status-red'
+                          }`}>
+                            {slaP98.toFixed(2)}%
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          {getSlaStatusBadge(slaP98)}
+                        </td>
+                      </tr>
+                      <tr className="bg-[rgba(255,255,255,0.04)]">
+                        <td className="py-3 px-4" colSpan={2}>
+                          <span className="font-semibold text-oid-text">P99</span>
+                        </td>
+                        <td className="py-3 px-4 text-right font-mono text-oid-sub">
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                            slaP99 >= 99.9
+                              ? 'bg-status-green-bg border border-status-green-border text-status-green'
+                              : slaP99 >= 99
+                                ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
+                                : 'bg-status-red-bg border border-status-red-border text-status-red'
+                          }`}>
+                            {slaP99.toFixed(2)}%
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 text-center">
+                          {getSlaStatusBadge(slaP99)}
                         </td>
                       </tr>
                     </tfoot>
