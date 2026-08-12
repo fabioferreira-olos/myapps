@@ -464,13 +464,31 @@ app.get('/api/reports/sla-by-client', async (req, res) => {
     }
 
     // Calculate SLA % for each client: (totalHours - downtimeHours) / totalHours * 100
-    const report = Object.entries(clientDowntime)
-      .map(([name, downtime]) => ({
+    // Include ALL registered clients (those without incidents get 100% SLA)
+    const allClientsResult = await pool.query('SELECT name FROM clients ORDER BY name ASC')
+    const allClientNames = allClientsResult.rows.map(r => r.name)
+
+    const report = allClientNames.map(name => {
+      const downtime = clientDowntime[name] || 0
+      return {
         name,
         sla: parseFloat((((totalPeriodHours - downtime) / totalPeriodHours) * 100).toFixed(4)),
         downtime: parseFloat(downtime.toFixed(2)),
-      }))
-      .sort((a, b) => a.sla - b.sla)
+      }
+    })
+
+    // Also include clients from RCAs that aren't in the clients table
+    for (const [name, downtime] of Object.entries(clientDowntime)) {
+      if (!allClientNames.includes(name)) {
+        report.push({
+          name,
+          sla: parseFloat((((totalPeriodHours - downtime) / totalPeriodHours) * 100).toFixed(4)),
+          downtime: parseFloat(downtime.toFixed(2)),
+        })
+      }
+    }
+
+    report.sort((a, b) => a.sla - b.sla)
 
     res.json({ totalPeriodHours: parseFloat(totalPeriodHours.toFixed(2)), clients: report })
   } catch (err) {

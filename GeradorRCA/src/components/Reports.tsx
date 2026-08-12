@@ -23,7 +23,7 @@ export default function Reports() {
   })
   const [slaPage, setSlaPage] = useState(0)
   const [incidentTypeFilter, setIncidentTypeFilter] = useState('')
-  const PAGE_SIZE = 15
+  const PAGE_SIZE = 100
 
   useEffect(() => {
     loadReports()
