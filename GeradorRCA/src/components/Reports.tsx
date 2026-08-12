@@ -87,14 +87,13 @@ export default function Reports() {
   }
 
   function calculatePercentile(values: number[], p: number): number {
-    // P99 = "99% dos clientes estão acima deste valor"
-    // Exclui os (100-p)% piores e retorna o menor valor restante
+    // PX = média do SLA dos X% melhores clientes (excluindo (100-X)% piores)
     if (values.length === 0) return 0
     const sorted = [...values].sort((a, b) => a - b)
     const excludeCount = Math.ceil(sorted.length * ((100 - p) / 100))
     const remaining = sorted.slice(excludeCount)
     if (remaining.length === 0) return sorted[sorted.length - 1]
-    return remaining[0]
+    return remaining.reduce((sum, v) => sum + v, 0) / remaining.length
   }
 
   // SLA Percentiles: "X% dos clientes têm SLA ≥ este valor"
