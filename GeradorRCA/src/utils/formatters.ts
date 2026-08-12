@@ -57,7 +57,9 @@ export function getActionTypeLabel(value: string): string {
 
 export function getIncidentTypeLabel(value: string): string {
   const labels: Record<string, string> = {
-    platform: 'Plataforma',
+    platform: 'Plataforma Olos',
+    infra_onprem: 'Infraestrutura On Premises',
+    infra_cloud: 'Infraestrutura Olos Cloud',
     infrastructure: 'Infraestrutura',
     other: 'Outros',
   }

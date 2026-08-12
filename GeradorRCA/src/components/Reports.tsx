@@ -155,8 +155,9 @@ export default function Reports() {
                 className="input-field"
               >
                 <option value="">Todos</option>
-                <option value="platform">Plataforma</option>
-                <option value="infrastructure">Infraestrutura</option>
+                <option value="platform">Plataforma Olos</option>
+                <option value="infra_onprem">Infraestrutura On Premises</option>
+                <option value="infra_cloud">Infraestrutura Olos Cloud</option>
                 <option value="other">Outros</option>
               </select>
             </div>
