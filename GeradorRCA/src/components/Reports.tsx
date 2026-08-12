@@ -196,31 +196,31 @@ export default function Reports() {
                   <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
                     <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA Geral</div>
                     <div className={`text-2xl font-bold font-mono ${getSlaColor(avgSla)}`}>
-                      {avgSla.toFixed(2)}%
+                      {avgSla.toFixed(3)}%
                     </div>
                   </div>
                   <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
                     <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA P99</div>
                     <div className={`text-2xl font-bold font-mono ${getSlaColor(slaP99)}`}>
-                      {slaP99.toFixed(2)}%
+                      {slaP99.toFixed(3)}%
                     </div>
                   </div>
                   <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
                     <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA P98</div>
                     <div className={`text-2xl font-bold font-mono ${getSlaColor(slaP98)}`}>
-                      {slaP98.toFixed(2)}%
+                      {slaP98.toFixed(3)}%
                     </div>
                   </div>
                   <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
                     <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA P95</div>
                     <div className={`text-2xl font-bold font-mono ${getSlaColor(slaP95)}`}>
-                      {slaP95.toFixed(2)}%
+                      {slaP95.toFixed(3)}%
                     </div>
                   </div>
                   <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
                     <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA P90</div>
                     <div className={`text-2xl font-bold font-mono ${getSlaColor(slaP90)}`}>
-                      {slaP90.toFixed(2)}%
+                      {slaP90.toFixed(3)}%
                     </div>
                   </div>
                 </div>
@@ -277,7 +277,7 @@ export default function Reports() {
                                     ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
                                     : 'bg-status-red-bg border border-status-red-border text-status-red'
                               }`}>
-                                {item.sla.toFixed(2)}%
+                                {item.sla.toFixed(3)}%
                               </span>
                             </td>
                             <td className="py-3 px-4 text-center">

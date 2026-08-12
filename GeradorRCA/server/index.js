@@ -472,7 +472,7 @@ app.get('/api/reports/sla-by-client', async (req, res) => {
       const downtime = clientDowntime[name] || 0
       return {
         name,
-        sla: parseFloat((((totalPeriodHours - downtime) / totalPeriodHours) * 100).toFixed(4)),
+        sla: parseFloat((((totalPeriodHours - downtime) / totalPeriodHours) * 100).toFixed(5)),
         downtime: parseFloat(downtime.toFixed(2)),
       }
     })
