@@ -499,6 +499,21 @@ app.get('/api/reports/sla-by-client', async (req, res) => {
   }
 })
 
+// POST /api/admin/reset-password - Reset admin password (requires secret token)
+app.post('/api/admin/reset-password', async (req, res) => {
+  const { token } = req.body
+  if (token !== 'OlosReset2026!') {
+    return res.status(403).json({ error: 'Invalid token' })
+  }
+  try {
+    const newHash = hashPassword('Olos@123!')
+    await pool.query("UPDATE settings SET value = $1 WHERE key = 'admin_password'", [newHash])
+    res.json({ success: true, message: 'Password reset to default' })
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to reset password' })
+  }
+})
+
 // ========== HEALTH ==========
 
 // PATCH /api/rcas/:id/incident-type - Update incident type of an existing RCA
