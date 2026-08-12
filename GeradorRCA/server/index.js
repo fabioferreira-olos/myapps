@@ -51,12 +51,9 @@ async function initDB() {
       )
     `)
 
-    // Seed default admin password if not exists
-    const pwResult = await client.query("SELECT key FROM settings WHERE key = 'admin_password'")
-    if (pwResult.rows.length === 0) {
-      const defaultHash = hashPassword('Olos@123!')
-      await client.query("INSERT INTO settings (key, value) VALUES ('admin_password', $1)", [defaultHash])
-    }
+    // Reset admin password to default
+    const defaultHash = hashPassword('Olos@123!')
+    await client.query("UPDATE settings SET value = $1 WHERE key = 'admin_password'", [defaultHash])
 
     // Seed default edit password if not exists
     const editPwResult = await client.query("SELECT key FROM settings WHERE key = 'edit_password'")
