@@ -130,7 +130,7 @@ export default function Header() {
             title="Listar RCAs gravadas"
           >
             <List className="w-4 h-4" />
-            <span className="hidden sm:inline">Gerar RCA</span>
+            <span className="hidden sm:inline">Relatórios RCA</span>
           </button>
 
           <button
@@ -139,7 +139,7 @@ export default function Header() {
             title="Relatórios"
           >
             <BarChart3 className="w-4 h-4" />
-            <span className="hidden sm:inline">Relatórios</span>
+            <span className="hidden sm:inline">SLA</span>
           </button>
 
           <button
