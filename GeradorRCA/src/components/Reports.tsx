@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Calendar, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Calendar, Shield, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 
 interface SLAData {
   name: string
@@ -23,6 +23,7 @@ export default function Reports() {
   })
   const [slaPage, setSlaPage] = useState(0)
   const [incidentTypeFilter, setIncidentTypeFilter] = useState('')
+  const [clientSearch, setClientSearch] = useState('')
   const PAGE_SIZE = 100
 
   useEffect(() => {
@@ -53,10 +54,13 @@ export default function Reports() {
   }
 
   const sortedSla = [...slaData].sort((a, b) => a.sla - b.sla)
+  const filteredSla = clientSearch
+    ? sortedSla.filter((d) => d.name.toLowerCase().includes(clientSearch.toLowerCase()))
+    : sortedSla
   const avgSla = slaData.length > 0 ? slaData.reduce((sum, d) => sum + d.sla, 0) / slaData.length : 0
 
-  const slaTotalPages = Math.ceil(sortedSla.length / PAGE_SIZE)
-  const paginatedSla = sortedSla.slice(slaPage * PAGE_SIZE, (slaPage + 1) * PAGE_SIZE)
+  const slaTotalPages = Math.ceil(filteredSla.length / PAGE_SIZE)
+  const paginatedSla = filteredSla.slice(slaPage * PAGE_SIZE, (slaPage + 1) * PAGE_SIZE)
 
   function getSlaStatusBadge(sla: number) {
     if (sla >= 99.9) {
@@ -237,6 +241,18 @@ export default function Reports() {
                 </h2>
               </div>
 
+              {/* Client search */}
+              <div className="relative mb-4">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-oid-muted" />
+                <input
+                  type="text"
+                  value={clientSearch}
+                  onChange={(e) => { setClientSearch(e.target.value); setSlaPage(0) }}
+                  className="input-field pl-9 text-sm"
+                  placeholder="Buscar cliente..."
+                />
+              </div>
+
               {slaData.length === 0 ? (
                 <div className="text-center py-8 text-oid-muted border-2 border-dashed border-oid-border rounded-oid-md">
                   <p>Nenhum dado de SLA encontrado para o período selecionado</p>
@@ -292,7 +308,7 @@ export default function Reports() {
                   {slaTotalPages > 1 && (
                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-oid-border-soft">
                       <span className="text-sm text-oid-muted">
-                        Mostrando {slaPage * PAGE_SIZE + 1}–{Math.min((slaPage + 1) * PAGE_SIZE, sortedSla.length)} de {sortedSla.length}
+                        Mostrando {slaPage * PAGE_SIZE + 1}–{Math.min((slaPage + 1) * PAGE_SIZE, filteredSla.length)} de {filteredSla.length}
                       </span>
                       <div className="flex items-center gap-2">
                         <button
