@@ -120,7 +120,7 @@ export default function Reports() {
             Voltar
           </button>
           <h1 className="text-2xl font-bold text-oid-text">
-            Relatórios
+            SLA
           </h1>
         </div>
 

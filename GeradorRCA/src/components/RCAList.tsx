@@ -142,7 +142,7 @@ export default function RCAList() {
             Voltar
           </button>
           <h1 className="text-2xl font-bold text-oid-text">
-            RCAs Gravadas
+            Relatórios RCA
           </h1>
           <button
             onClick={() => {
