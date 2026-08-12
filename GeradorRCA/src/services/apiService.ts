@@ -132,3 +132,29 @@ export async function verifyEditPassword(password: string): Promise<boolean> {
   })
   return res.ok
 }
+
+// ========== RCA Classification ==========
+
+export interface UnclassifiedRCA {
+  id: string
+  title: string
+  incident_id: string
+  affected_clients: string
+  incident_type: string | null
+  created_at: string
+}
+
+export async function fetchUnclassifiedRCAs(): Promise<UnclassifiedRCA[]> {
+  const res = await fetch(`${API_BASE}/rcas/unclassified`)
+  if (!res.ok) throw new Error('Failed to fetch unclassified RCAs')
+  return res.json()
+}
+
+export async function updateRCAIncidentType(id: string, incidentType: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/rcas/${id}/incident-type`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ incidentType }),
+  })
+  if (!res.ok) throw new Error('Failed to update incident type')
+}

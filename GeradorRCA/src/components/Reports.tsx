@@ -159,6 +159,7 @@ export default function Reports() {
                 <option value="infra_onprem">Infraestrutura On Premises</option>
                 <option value="infra_cloud">Infraestrutura Olos Cloud</option>
                 <option value="other">Outros</option>
+                <option value="unclassified">Não classificado</option>
               </select>
             </div>
             <div>

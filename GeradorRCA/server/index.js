@@ -361,7 +361,8 @@ app.get('/api/reports/downtime-by-client', async (req, res) => {
       if (!data.affectedClients) continue
 
       // Filter by incident type if specified
-      if (type && data.incidentType !== type) continue
+      if (type === 'unclassified' && data.incidentType) continue
+      if (type && type !== 'unclassified' && data.incidentType !== type) continue
 
       // Calculate downtime from timeline (preferred) or legacy startDate/endDate
       let diffMs = 0
@@ -438,7 +439,8 @@ app.get('/api/reports/sla-by-client', async (req, res) => {
       if (!data.affectedClients) continue
 
       // Filter by incident type if specified
-      if (type && data.incidentType !== type) continue
+      if (type === 'unclassified' && data.incidentType) continue
+      if (type && type !== 'unclassified' && data.incidentType !== type) continue
 
       // Calculate downtime from timeline (preferred) or legacy startDate/endDate
       let diffMs = 0
@@ -498,6 +500,51 @@ app.get('/api/reports/sla-by-client', async (req, res) => {
 })
 
 // ========== HEALTH ==========
+
+// PATCH /api/rcas/:id/incident-type - Update incident type of an existing RCA
+app.patch('/api/rcas/:id/incident-type', async (req, res) => {
+  const { id } = req.params
+  const { incidentType } = req.body
+  const validTypes = ['platform', 'infra_onprem', 'infra_cloud', 'other']
+  if (!incidentType || !validTypes.includes(incidentType)) {
+    return res.status(400).json({ error: 'Invalid incident type' })
+  }
+  try {
+    const result = await pool.query(
+      `UPDATE rcas SET data = jsonb_set(data, '{incidentType}', $1::jsonb), updated_at = NOW() WHERE id = $2 RETURNING id`,
+      [JSON.stringify(incidentType), id]
+    )
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'RCA not found' })
+    }
+    res.json({ success: true, id: result.rows[0].id })
+  } catch (err) {
+    console.error('Error updating incident type:', err)
+    res.status(500).json({ error: 'Failed to update incident type' })
+  }
+})
+
+// GET /api/rcas/unclassified - List RCAs without incident type
+app.get('/api/rcas/unclassified', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT id,
+             data->>'title' as title,
+             data->>'incidentId' as incident_id,
+             data->>'affectedClients' as affected_clients,
+             data->>'incidentType' as incident_type,
+             created_at
+      FROM rcas
+      WHERE data->>'incidentType' IS NULL
+         OR data->>'incidentType' = ''
+      ORDER BY created_at DESC
+    `)
+    res.json(result.rows)
+  } catch (err) {
+    console.error('Error fetching unclassified RCAs:', err)
+    res.status(500).json({ error: 'Failed to fetch unclassified RCAs' })
+  }
+})
 
 app.get('/api/health', async (req, res) => {
   try {

@@ -4,7 +4,7 @@ import { ArrowLeft, Save, Trash2, Wifi, WifiOff, Lock, Eye, EyeOff, Plus, X } fr
 import { useAIConfigStore } from '../context/RCAContext'
 import { aiService } from '../services/aiService'
 import { AIConfig } from '../types/rca'
-import { fetchClients, createClient, deleteClient, Client, fetchRCAs, deleteRCA, RCASummary, verifyPassword, changePassword, getEditPassword, setEditPassword } from '../services/apiService'
+import { fetchClients, createClient, deleteClient, Client, fetchRCAs, deleteRCA, RCASummary, verifyPassword, changePassword, getEditPassword, setEditPassword, fetchUnclassifiedRCAs, updateRCAIncidentType, UnclassifiedRCA } from '../services/apiService'
 
 export default function AdminPanel() {
   const navigate = useNavigate()
@@ -46,6 +46,10 @@ export default function AdminPanel() {
   const [editPw, setEditPw] = useState('')
   const [editPwSaved, setEditPwSaved] = useState(false)
 
+  // RCA classification state
+  const [unclassifiedRcas, setUnclassifiedRcas] = useState<UnclassifiedRCA[]>([])
+  const [classifyLoading, setClassifyLoading] = useState(false)
+
   useEffect(() => {
     loadConfig()
   }, [])
@@ -65,6 +69,7 @@ export default function AdminPanel() {
       loadClients()
       loadRCAs()
       loadEditPassword()
+      loadUnclassifiedRcas()
     } else {
       setPasswordError('Senha incorreta')
     }
@@ -171,6 +176,28 @@ export default function AdminPanel() {
   const loadEditPassword = async () => {
     const pw = await getEditPassword()
     setEditPw(pw)
+  }
+
+  const loadUnclassifiedRcas = async () => {
+    setClassifyLoading(true)
+    try {
+      const data = await fetchUnclassifiedRCAs()
+      setUnclassifiedRcas(data)
+    } catch (err) {
+      console.error('Failed to load unclassified RCAs:', err)
+    } finally {
+      setClassifyLoading(false)
+    }
+  }
+
+  const handleClassifyRCA = async (id: string, incidentType: string) => {
+    try {
+      await updateRCAIncidentType(id, incidentType)
+      setUnclassifiedRcas((prev) => prev.filter((r) => r.id !== id))
+    } catch (err) {
+      console.error('Failed to classify RCA:', err)
+      alert('Erro ao classificar RCA')
+    }
   }
 
   const handleSaveEditPassword = async () => {
@@ -537,6 +564,68 @@ export default function AdminPanel() {
                   Cancelar
                 </button>
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Classify RCAs */}
+        <h2 className="text-xl font-bold text-oid-text mt-8 mb-4">
+          Classificar RCAs
+        </h2>
+        <div className="card space-y-4">
+          <div className="bg-accent-glow border border-accent/25 rounded-oid-sm p-4">
+            <p className="text-sm text-accent-light">
+              RCAs sem tipo de incidente definido. Classifique cada uma para que apareçam corretamente nos relatórios filtrados.
+            </p>
+          </div>
+
+          {classifyLoading ? (
+            <p className="text-sm text-oid-muted">Carregando...</p>
+          ) : unclassifiedRcas.length === 0 ? (
+            <p className="text-sm text-status-green">✓ Todas as RCAs estão classificadas!</p>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-sm text-oid-muted">{unclassifiedRcas.length} RCA{unclassifiedRcas.length !== 1 ? 's' : ''} sem classificação</p>
+              {unclassifiedRcas.map((rca) => (
+                <div key={rca.id} className="border border-oid-border rounded-oid-sm p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-sm font-semibold text-orange">{rca.id}</span>
+                    <span className="text-xs text-oid-muted">
+                      {new Date(rca.created_at).toLocaleDateString('pt-BR')}
+                    </span>
+                  </div>
+                  <p className="text-sm text-oid-sub truncate">{rca.title || 'Sem título'}</p>
+                  {rca.affected_clients && (
+                    <p className="text-xs text-oid-muted">Clientes: {rca.affected_clients}</p>
+                  )}
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <button
+                      onClick={() => handleClassifyRCA(rca.id, 'platform')}
+                      className="btn-secondary text-xs py-1 px-2.5"
+                    >
+                      Plataforma Olos
+                    </button>
+                    <button
+                      onClick={() => handleClassifyRCA(rca.id, 'infra_onprem')}
+                      className="btn-secondary text-xs py-1 px-2.5"
+                    >
+                      Infra On Premises
+                    </button>
+                    <button
+                      onClick={() => handleClassifyRCA(rca.id, 'infra_cloud')}
+                      className="btn-secondary text-xs py-1 px-2.5"
+                    >
+                      Infra Olos Cloud
+                    </button>
+                    <button
+                      onClick={() => handleClassifyRCA(rca.id, 'other')}
+                      className="btn-secondary text-xs py-1 px-2.5"
+                    >
+                      Outros
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
