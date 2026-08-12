@@ -117,17 +117,32 @@ export default function Reports() {
     return sorted[Math.max(0, Math.min(index, sorted.length - 1))]
   }
 
-  // Percentiles for downtime (P95/P98/P99 = top values, higher = worse)
+  // Percentiles for downtime (higher = worse)
   const downtimeValues = downtimeData.map((d) => d.hours)
+  const downtimeP90 = calculatePercentile(downtimeValues, 90)
   const downtimeP95 = calculatePercentile(downtimeValues, 95)
+  const downtimeP96 = calculatePercentile(downtimeValues, 96)
+  const downtimeP97 = calculatePercentile(downtimeValues, 97)
   const downtimeP98 = calculatePercentile(downtimeValues, 98)
   const downtimeP99 = calculatePercentile(downtimeValues, 99)
 
-  // Percentiles for SLA (P5/P2/P1 from bottom = worst clients)
+  // Percentiles for SLA (value above which X% of clients sit)
   const slaValues = slaData.map((d) => d.sla)
-  const slaP95 = calculatePercentile(slaValues, 5)   // 5% worst → P95 guarantee
-  const slaP98 = calculatePercentile(slaValues, 2)   // 2% worst → P98 guarantee
-  const slaP99 = calculatePercentile(slaValues, 1)   // 1% worst → P99 guarantee
+  const slaP90 = calculatePercentile(slaValues, 10)  // 10% worst → 90% of clients are above
+  const slaP95 = calculatePercentile(slaValues, 5)   // 5% worst → 95% of clients are above
+  const slaP96 = calculatePercentile(slaValues, 4)   // 4% worst → 96% of clients are above
+  const slaP97 = calculatePercentile(slaValues, 3)   // 3% worst → 97% of clients are above
+  const slaP98 = calculatePercentile(slaValues, 2)   // 2% worst → 98% of clients are above
+  const slaP99 = calculatePercentile(slaValues, 1)   // 1% worst → 99% of clients are above
+
+  const slaPercentiles = [
+    { label: 'P90', value: slaP90 },
+    { label: 'P95', value: slaP95 },
+    { label: 'P96', value: slaP96 },
+    { label: 'P97', value: slaP97 },
+    { label: 'P98', value: slaP98 },
+    { label: 'P99', value: slaP99 },
+  ]
 
   return (
     <div className="min-h-screen p-4 md:p-8 animate-fade-up">
@@ -382,69 +397,30 @@ export default function Reports() {
                       })}
                     </tbody>
                     <tfoot>
-                      <tr className="border-t-2 border-oid-border bg-[rgba(255,255,255,0.04)]">
-                        <td className="py-3 px-4" colSpan={2}>
-                          <span className="font-semibold text-oid-text">P95</span>
-                        </td>
-                        <td className="py-3 px-4 text-right font-mono text-oid-sub">
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                            slaP95 >= 99.9
-                              ? 'bg-status-green-bg border border-status-green-border text-status-green'
-                              : slaP95 >= 99
-                                ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
-                                : 'bg-status-red-bg border border-status-red-border text-status-red'
-                          }`}>
-                            {slaP95.toFixed(2)}%
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          {getSlaStatusBadge(slaP95)}
-                        </td>
-                      </tr>
-                      <tr className="bg-[rgba(255,255,255,0.04)]">
-                        <td className="py-3 px-4" colSpan={2}>
-                          <span className="font-semibold text-oid-text">P98</span>
-                        </td>
-                        <td className="py-3 px-4 text-right font-mono text-oid-sub">
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                            slaP98 >= 99.9
-                              ? 'bg-status-green-bg border border-status-green-border text-status-green'
-                              : slaP98 >= 99
-                                ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
-                                : 'bg-status-red-bg border border-status-red-border text-status-red'
-                          }`}>
-                            {slaP98.toFixed(2)}%
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          {getSlaStatusBadge(slaP98)}
-                        </td>
-                      </tr>
-                      <tr className="bg-[rgba(255,255,255,0.04)]">
-                        <td className="py-3 px-4" colSpan={2}>
-                          <span className="font-semibold text-oid-text">P99</span>
-                        </td>
-                        <td className="py-3 px-4 text-right font-mono text-oid-sub">
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                            slaP99 >= 99.9
-                              ? 'bg-status-green-bg border border-status-green-border text-status-green'
-                              : slaP99 >= 99
-                                ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
-                                : 'bg-status-red-bg border border-status-red-border text-status-red'
-                          }`}>
-                            {slaP99.toFixed(2)}%
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          {getSlaStatusBadge(slaP99)}
-                        </td>
-                      </tr>
+                      {slaPercentiles.map((p, idx) => (
+                        <tr key={p.label} className={`${idx === 0 ? 'border-t-2 border-oid-border' : ''} bg-[rgba(255,255,255,0.04)]`}>
+                          <td className="py-2.5 px-4" colSpan={2}>
+                            <span className="font-semibold text-oid-text text-sm">{p.label}</span>
+                            <span className="text-xs text-oid-muted ml-2">{100 - parseInt(p.label.replace('P', ''))}% dos clientes ≥</span>
+                          </td>
+                          <td className="py-2.5 px-4 text-right font-mono text-oid-sub">
+                          </td>
+                          <td className="py-2.5 px-4 text-right">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
+                              p.value >= 99.9
+                                ? 'bg-status-green-bg border border-status-green-border text-status-green'
+                                : p.value >= 99
+                                  ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
+                                  : 'bg-status-red-bg border border-status-red-border text-status-red'
+                            }`}>
+                              {p.value.toFixed(2)}%
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-4 text-center">
+                            {getSlaStatusBadge(p.value)}
+                          </td>
+                        </tr>
+                      ))}
                     </tfoot>
                   </table>
                   {slaTotalPages > 1 && (
