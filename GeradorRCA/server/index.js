@@ -364,6 +364,9 @@ app.get('/api/reports/downtime-by-client', async (req, res) => {
       if (type === 'unclassified' && data.incidentType) continue
       if (type && type !== 'unclassified' && data.incidentType !== type) continue
 
+      // Skip laudo RCAs (no downtime counted)
+      if (data.isLaudo) continue
+
       // Calculate downtime from timeline (preferred) or legacy startDate/endDate
       let diffMs = 0
       const timelineEntries = (data.timeline || []).filter(e => e.dateTime)
@@ -441,6 +444,9 @@ app.get('/api/reports/sla-by-client', async (req, res) => {
       // Filter by incident type if specified
       if (type === 'unclassified' && data.incidentType) continue
       if (type && type !== 'unclassified' && data.incidentType !== type) continue
+
+      // Skip laudo RCAs (no downtime counted)
+      if (data.isLaudo) continue
 
       // Calculate downtime from timeline (preferred) or legacy startDate/endDate
       let diffMs = 0

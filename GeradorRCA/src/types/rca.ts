@@ -31,6 +31,7 @@ export interface RCADocument {
   unavailability: 'none' | 'partial' | 'total' | '';
   incidentType: 'platform' | 'infra_onprem' | 'infra_cloud' | 'other' | '';
   hideDowntime: boolean;
+  isLaudo: boolean;
 
   // Impact
   affectedClients: string;

@@ -18,6 +18,7 @@ function createEmptyRCA(): RCADocument {
     unavailability: '',
     incidentType: '',
     hideDowntime: false,
+    isLaudo: false,
     affectedClients: '',
     affectedServices: '',
     clientImpactDescription: '',

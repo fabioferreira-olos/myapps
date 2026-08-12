@@ -145,7 +145,7 @@ export async function exportToDocx(doc: RCADocument, clientName?: string): Promi
   const startFormatted = timelineStart ? formatDateTime(timelineStart) : 'N/A'
   const endFormatted = timelineEnd ? formatDateTime(timelineEnd) : 'N/A'
   addField('Data de Início', startFormatted)
-  addField('Data de Solução', `${endFormatted}${!doc.hideDowntime && totalDowntime ? ` | Tempo Total Indisponibilidade: ${totalDowntime}` : ''}`)
+  addField('Data de Solução', `${endFormatted}${!doc.hideDowntime && !doc.isLaudo && totalDowntime ? ` | Tempo Total Indisponibilidade: ${totalDowntime}` : ''}`)
 
   // Impact
   if (doc.clientImpactDescription) {

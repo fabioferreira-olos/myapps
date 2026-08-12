@@ -200,7 +200,7 @@ export async function exportToPdf(doc: RCADocument, clientName?: string): Promis
 
   // End date + downtime on same conceptual line
   let endLine = endFormatted
-  if (!doc.hideDowntime && totalDowntime) {
+  if (!doc.hideDowntime && !doc.isLaudo && totalDowntime) {
     endLine += ` | Tempo Total Indisponibilidade: ${totalDowntime}`
   }
   addField('Data de Solução', endLine)

@@ -42,8 +42,23 @@ export default function TimelineEditor() {
         </button>
       </div>
 
+      {/* Modo Laudo */}
+      <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-3">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={document.isLaudo}
+            onChange={(e) => updateField('isLaudo', e.target.checked)}
+            className="w-4 h-4 rounded border-oid-border text-orange focus:ring-accent-glow"
+          />
+          <span className="text-sm font-medium text-oid-sub">
+            Modo Laudo — Não contabilizar horas de indisponibilidade
+          </span>
+        </label>
+      </div>
+
       {/* Downtime summary card */}
-      {timelineStats && (
+      {timelineStats && !document.isLaudo && (
         <div className="bg-accent-glow border border-accent/25 rounded-oid-sm p-4">
           <div className="flex items-center gap-2 mb-3">
             <Timer className="w-4 h-4 text-accent-light" />
