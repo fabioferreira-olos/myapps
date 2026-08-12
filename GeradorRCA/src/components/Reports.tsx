@@ -87,18 +87,22 @@ export default function Reports() {
   }
 
   function calculatePercentile(values: number[], p: number): number {
+    // P99 = "99% dos clientes estão acima deste valor"
+    // Exclui os (100-p)% piores e retorna o menor valor restante
     if (values.length === 0) return 0
     const sorted = [...values].sort((a, b) => a - b)
-    const index = Math.ceil((p / 100) * sorted.length) - 1
-    return sorted[Math.max(0, Math.min(index, sorted.length - 1))]
+    const excludeCount = Math.ceil(sorted.length * ((100 - p) / 100))
+    const remaining = sorted.slice(excludeCount)
+    if (remaining.length === 0) return sorted[sorted.length - 1]
+    return remaining[0]
   }
 
-  // SLA Percentiles (value above which X% of clients sit)
+  // SLA Percentiles: "X% dos clientes têm SLA ≥ este valor"
   const slaValues = slaData.map((d) => d.sla)
-  const slaP90 = calculatePercentile(slaValues, 10)
-  const slaP95 = calculatePercentile(slaValues, 5)
-  const slaP98 = calculatePercentile(slaValues, 2)
-  const slaP99 = calculatePercentile(slaValues, 1)
+  const slaP90 = calculatePercentile(slaValues, 90)
+  const slaP95 = calculatePercentile(slaValues, 95)
+  const slaP98 = calculatePercentile(slaValues, 98)
+  const slaP99 = calculatePercentile(slaValues, 99)
 
   return (
     <div className="min-h-screen p-4 md:p-8 animate-fade-up">
