@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowLeft, Calendar, Clock, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
-
-interface DowntimeData {
-  name: string
-  hours: number
-}
+import { ArrowLeft, Calendar, Shield, ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface SLAData {
   name: string
@@ -15,7 +10,6 @@ interface SLAData {
 
 export default function Reports() {
   const navigate = useNavigate()
-  const [downtimeData, setDowntimeData] = useState<DowntimeData[]>([])
   const [slaData, setSlaData] = useState<SLAData[]>([])
   const [totalPeriodHours, setTotalPeriodHours] = useState(0)
   const [loading, setLoading] = useState(false)
@@ -27,7 +21,6 @@ export default function Reports() {
   const [dateTo, setDateTo] = useState(() => {
     return new Date().toISOString().split('T')[0]
   })
-  const [downtimePage, setDowntimePage] = useState(0)
   const [slaPage, setSlaPage] = useState(0)
   const [incidentTypeFilter, setIncidentTypeFilter] = useState('')
   const PAGE_SIZE = 15
@@ -38,7 +31,6 @@ export default function Reports() {
 
   const loadReports = async () => {
     setLoading(true)
-    setDowntimePage(0)
     setSlaPage(0)
     try {
       const params = new URLSearchParams()
@@ -46,14 +38,8 @@ export default function Reports() {
       if (dateTo) params.set('to', dateTo)
       if (incidentTypeFilter) params.set('type', incidentTypeFilter)
 
-      const [downtimeRes, slaRes] = await Promise.all([
-        fetch(`/api/reports/downtime-by-client?${params}`),
-        fetch(`/api/reports/sla-by-client?${params}`),
-      ])
+      const slaRes = await fetch(`/api/reports/sla-by-client?${params}`)
 
-      if (downtimeRes.ok) {
-        setDowntimeData(await downtimeRes.json())
-      }
       if (slaRes.ok) {
         const slaResult = await slaRes.json()
         setSlaData(slaResult.clients || [])
@@ -66,14 +52,8 @@ export default function Reports() {
     }
   }
 
-  const totalDowntimeHours = downtimeData.reduce((sum, d) => sum + d.hours, 0)
-
-  const sortedDowntime = [...downtimeData].sort((a, b) => b.hours - a.hours)
   const sortedSla = [...slaData].sort((a, b) => a.sla - b.sla)
   const avgSla = slaData.length > 0 ? slaData.reduce((sum, d) => sum + d.sla, 0) / slaData.length : 0
-
-  const downtimeTotalPages = Math.ceil(sortedDowntime.length / PAGE_SIZE)
-  const paginatedDowntime = sortedDowntime.slice(downtimePage * PAGE_SIZE, (downtimePage + 1) * PAGE_SIZE)
 
   const slaTotalPages = Math.ceil(sortedSla.length / PAGE_SIZE)
   const paginatedSla = sortedSla.slice(slaPage * PAGE_SIZE, (slaPage + 1) * PAGE_SIZE)
@@ -100,14 +80,10 @@ export default function Reports() {
     )
   }
 
-  function getPercentBadge(percent: number) {
-    if (percent >= 30) {
-      return 'bg-status-red-bg border border-status-red-border text-status-red'
-    }
-    if (percent >= 15) {
-      return 'bg-status-amber-bg border border-status-amber-border text-status-amber'
-    }
-    return 'bg-oid-surface-soft border border-oid-border text-oid-sub'
+  function getSlaColor(sla: number) {
+    if (sla >= 99.9) return 'text-status-green'
+    if (sla >= 99) return 'text-status-amber'
+    return 'text-status-red'
   }
 
   function calculatePercentile(values: number[], p: number): number {
@@ -117,32 +93,12 @@ export default function Reports() {
     return sorted[Math.max(0, Math.min(index, sorted.length - 1))]
   }
 
-  // Percentiles for downtime (higher = worse)
-  const downtimeValues = downtimeData.map((d) => d.hours)
-  const downtimeP90 = calculatePercentile(downtimeValues, 90)
-  const downtimeP95 = calculatePercentile(downtimeValues, 95)
-  const downtimeP96 = calculatePercentile(downtimeValues, 96)
-  const downtimeP97 = calculatePercentile(downtimeValues, 97)
-  const downtimeP98 = calculatePercentile(downtimeValues, 98)
-  const downtimeP99 = calculatePercentile(downtimeValues, 99)
-
-  // Percentiles for SLA (value above which X% of clients sit)
+  // SLA Percentiles (value above which X% of clients sit)
   const slaValues = slaData.map((d) => d.sla)
-  const slaP90 = calculatePercentile(slaValues, 10)  // 10% worst → 90% of clients are above
-  const slaP95 = calculatePercentile(slaValues, 5)   // 5% worst → 95% of clients are above
-  const slaP96 = calculatePercentile(slaValues, 4)   // 4% worst → 96% of clients are above
-  const slaP97 = calculatePercentile(slaValues, 3)   // 3% worst → 97% of clients are above
-  const slaP98 = calculatePercentile(slaValues, 2)   // 2% worst → 98% of clients are above
-  const slaP99 = calculatePercentile(slaValues, 1)   // 1% worst → 99% of clients are above
-
-  const slaPercentiles = [
-    { label: 'P90', value: slaP90 },
-    { label: 'P95', value: slaP95 },
-    { label: 'P96', value: slaP96 },
-    { label: 'P97', value: slaP97 },
-    { label: 'P98', value: slaP98 },
-    { label: 'P99', value: slaP99 },
-  ]
+  const slaP90 = calculatePercentile(slaValues, 10)
+  const slaP95 = calculatePercentile(slaValues, 5)
+  const slaP98 = calculatePercentile(slaValues, 2)
+  const slaP99 = calculatePercentile(slaValues, 1)
 
   return (
     <div className="min-h-screen p-4 md:p-8 animate-fade-up">
@@ -225,124 +181,55 @@ export default function Reports() {
           </div>
         ) : (
           <div className="space-y-6">
-            {/* Report 1: Downtime by Client */}
-            <div className="card">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-oid-text flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-orange" />
-                  Indisponibilidade por Cliente
+            {/* Disponibilidade Geral */}
+            {slaData.length > 0 && (
+              <div className="card">
+                <h2 className="text-lg font-semibold text-oid-text mb-4 flex items-center gap-2">
+                  <Shield className="w-5 h-5 text-accent-light" />
+                  Disponibilidade Geral
                 </h2>
-                {downtimeData.length > 0 && (
-                  <span className="text-sm text-oid-muted">
-                    Total: <strong className="text-oid-text font-mono">{totalDowntimeHours.toFixed(2)}h</strong>
-                  </span>
-                )}
-              </div>
-
-              {downtimeData.length === 0 ? (
-                <div className="text-center py-8 text-oid-muted border-2 border-dashed border-oid-border rounded-oid-md">
-                  <p>Nenhum dado de indisponibilidade encontrado para o período selecionado</p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-oid-border">
-                        <th className="text-left py-3 px-4 font-semibold text-oid-sub">#</th>
-                        <th className="text-left py-3 px-4 font-semibold text-oid-sub">Cliente</th>
-                        <th className="text-right py-3 px-4 font-semibold text-oid-sub">Indisponibilidade</th>
-                        <th className="text-right py-3 px-4 font-semibold text-oid-sub">% do Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paginatedDowntime.map((item, idx) => {
-                        const globalIdx = downtimePage * PAGE_SIZE + idx
-                        const percent = totalDowntimeHours > 0 ? (item.hours / totalDowntimeHours) * 100 : 0
-                        return (
-                          <tr
-                            key={item.name}
-                            className="border-b border-oid-border-soft hover:bg-oid-surface-soft transition-colors"
-                          >
-                            <td className="py-3 px-4 text-oid-muted font-mono text-xs">
-                              {globalIdx + 1}
-                            </td>
-                            <td className="py-3 px-4 text-oid-text font-medium">
-                              {item.name}
-                            </td>
-                            <td className="py-3 px-4 text-right font-mono text-oid-text">
-                              {item.hours.toFixed(2)}h
-                            </td>
-                            <td className="py-3 px-4 text-right">
-                              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getPercentBadge(percent)}`}>
-                                {percent.toFixed(1)}%
-                              </span>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                    <tfoot>
-                      <tr className="border-t-2 border-oid-border bg-[rgba(255,255,255,0.04)]">
-                        <td className="py-3 px-4" colSpan={2}>
-                          <span className="font-semibold text-oid-text">Total</span>
-                        </td>
-                        <td className="py-3 px-4 text-right font-mono font-bold text-orange">
-                          {totalDowntimeHours.toFixed(2)}h
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-oid-surface border border-oid-border text-oid-sub">
-                            100%
-                          </span>
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                  {downtimeTotalPages > 1 && (
-                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-oid-border-soft">
-                      <span className="text-sm text-oid-muted">
-                        Mostrando {downtimePage * PAGE_SIZE + 1}–{Math.min((downtimePage + 1) * PAGE_SIZE, sortedDowntime.length)} de {sortedDowntime.length}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setDowntimePage((p) => Math.max(0, p - 1))}
-                          disabled={downtimePage === 0}
-                          className="btn-secondary flex items-center gap-1 text-xs py-1.5 px-3 disabled:opacity-40"
-                        >
-                          <ChevronLeft className="w-3.5 h-3.5" />
-                          Anterior
-                        </button>
-                        <span className="text-sm text-oid-sub font-medium font-mono">
-                          {downtimePage + 1} / {downtimeTotalPages}
-                        </span>
-                        <button
-                          onClick={() => setDowntimePage((p) => Math.min(downtimeTotalPages - 1, p + 1))}
-                          disabled={downtimePage >= downtimeTotalPages - 1}
-                          className="btn-secondary flex items-center gap-1 text-xs py-1.5 px-3 disabled:opacity-40"
-                        >
-                          Próximo
-                          <ChevronRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                  <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
+                    <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA Geral</div>
+                    <div className={`text-2xl font-bold font-mono ${getSlaColor(avgSla)}`}>
+                      {avgSla.toFixed(2)}%
                     </div>
-                  )}
+                  </div>
+                  <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
+                    <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA P99</div>
+                    <div className={`text-2xl font-bold font-mono ${getSlaColor(slaP99)}`}>
+                      {slaP99.toFixed(2)}%
+                    </div>
+                  </div>
+                  <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
+                    <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA P98</div>
+                    <div className={`text-2xl font-bold font-mono ${getSlaColor(slaP98)}`}>
+                      {slaP98.toFixed(2)}%
+                    </div>
+                  </div>
+                  <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
+                    <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA P95</div>
+                    <div className={`text-2xl font-bold font-mono ${getSlaColor(slaP95)}`}>
+                      {slaP95.toFixed(2)}%
+                    </div>
+                  </div>
+                  <div className="bg-oid-surface-soft border border-oid-border rounded-oid-sm p-4 text-center">
+                    <div className="text-xs text-oid-muted font-semibold uppercase tracking-wider mb-2">SLA P90</div>
+                    <div className={`text-2xl font-bold font-mono ${getSlaColor(slaP90)}`}>
+                      {slaP90.toFixed(2)}%
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
-            {/* Report 2: SLA by Client */}
+            {/* SLA por Cliente */}
             <div className="card">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-oid-text flex items-center gap-2">
                   <Shield className="w-5 h-5 text-accent-light" />
                   SLA por Cliente
                 </h2>
-                {slaData.length > 0 && (
-                  <span className="text-sm text-oid-muted">
-                    SLA P99: <strong className={`font-mono ${slaP99 >= 99.9 ? 'text-status-green' : slaP99 >= 99 ? 'text-status-amber' : 'text-status-red'}`}>
-                      {slaP99.toFixed(2)}%
-                    </strong>
-                  </span>
-                )}
               </div>
 
               {slaData.length === 0 ? (
@@ -396,32 +283,6 @@ export default function Reports() {
                         )
                       })}
                     </tbody>
-                    <tfoot>
-                      {slaPercentiles.map((p, idx) => (
-                        <tr key={p.label} className={`${idx === 0 ? 'border-t-2 border-oid-border' : ''} bg-[rgba(255,255,255,0.04)]`}>
-                          <td className="py-2.5 px-4" colSpan={2}>
-                            <span className="font-semibold text-oid-text text-sm">{p.label}</span>
-                            <span className="text-xs text-oid-muted ml-2">{100 - parseInt(p.label.replace('P', ''))}% dos clientes ≥</span>
-                          </td>
-                          <td className="py-2.5 px-4 text-right font-mono text-oid-sub">
-                          </td>
-                          <td className="py-2.5 px-4 text-right">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${
-                              p.value >= 99.9
-                                ? 'bg-status-green-bg border border-status-green-border text-status-green'
-                                : p.value >= 99
-                                  ? 'bg-status-amber-bg border border-status-amber-border text-status-amber'
-                                  : 'bg-status-red-bg border border-status-red-border text-status-red'
-                            }`}>
-                              {p.value.toFixed(2)}%
-                            </span>
-                          </td>
-                          <td className="py-2.5 px-4 text-center">
-                            {getSlaStatusBadge(p.value)}
-                          </td>
-                        </tr>
-                      ))}
-                    </tfoot>
                   </table>
                   {slaTotalPages > 1 && (
                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-oid-border-soft">
